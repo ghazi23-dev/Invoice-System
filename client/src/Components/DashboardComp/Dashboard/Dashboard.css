@@ -1,0 +1,24 @@
+.paid-cell {
+          background-color: green;
+          color: white;
+          opacity: 0.8;
+        }
+        
+        .not-paid-cell {
+          background-color: yellow;
+          color: black;
+          opacity: 0.8;
+
+        }
+        
+        .canceled-cell {
+          background-color: red;
+          color: white;
+          opacity: 0.8;
+
+        }
+        
+        .new-row {
+          background-color: #00152934;
+        }
+        

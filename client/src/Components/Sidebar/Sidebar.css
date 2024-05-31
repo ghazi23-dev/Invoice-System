@@ -1,0 +1,206 @@
+
+.sidebar {
+  height: 100vh;
+}
+
+.content {
+  height: auto;
+  padding: 3px;
+  background-color: rgba(235, 235, 234, 0.281);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.logo img {
+  width: 70px;
+  height: 70px;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.88);
+}
+
+.menu-bar {
+  height: 90vh;
+  margin-top: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  font-size: 1rem;
+  position: relative;
+}
+
+.toggle-theme-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle {
+  margin-left: 15px;
+  transition: ease-in-out 0.3s;
+}
+
+.ant-float-btn-content {
+  border-radius: 20px;
+  width: 40px;
+  height: 40px;
+}
+
+.ant-float-btn-content:hover {
+  background-color: #ddb232;
+}
+
+.ant-btn .userprofile {
+  background-color: #ddb232;
+}
+
+.user-profile {
+  top: 2px;
+  right: 0;
+  position: absolute;
+  background-color: #f3c027;
+  border-radius: 50px;
+  width: 53px;
+  margin-right: 20px;
+  height: 50px;
+  margin-top: 3px;
+  justify-content: center;
+}
+
+.bell {
+  position: absolute;
+  top: 12px;
+  right: 0px;
+  margin-right: 85px;
+  font-size: 40px;
+  cursor: pointer;
+  animation: bellAnimation 1.3s infinite alternate; /* Apply animation with looping */
+}
+
+.notificationNumber {
+  position: absolute;
+  top: 11px;
+  right: 77px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+  animation: bellAnimation 1.3s infinite alternate;
+}
+.notification-dialog {
+  position: absolute;
+  top: 63px; /* Adjust this value to position the dialog below the bell icon */
+  right: 80px;
+  background-color: rgba(255, 255, 255, 0.664);
+  border: 1px solid #000000;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(150, 0, 0, 0.1);
+  padding: 20px;
+  width: 360px;
+  z-index: 1000; /* Ensure the dialog appears above other elements */
+  padding-bottom: 0px;
+}
+
+.notification-dialog .toast div {
+  margin-bottom: 10px;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.notification-dialog .toast div p {
+  font-size: 14px;
+  font-weight: 1000;
+  line-height: 2;
+}
+
+.notification-dialog::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  right: 14px;
+  border-width: 0 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent rgb(196, 4, 4);
+}
+
+.notification-dialog::after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  right: 14px;
+  border-width: 0 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent #ccc;
+}
+
+.toast {
+  background-color: #333;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.notification-dialog button {
+  position: relative;
+  color: #000000;
+  font-size: 15px;
+  font-weight: 1000;
+  margin-left: 90px;
+}
+.notification-dialog .toast {
+  max-height:350px; /* Adjust this value based on the size of your messages */
+  overflow-y:scroll /* Add a scrollbar if the content overflows */
+}
+.CircleAlert {
+  position: relative;
+  width: 25px;
+  height: 25px;
+  margin-left: 6px;
+  background-color: red;
+  border-radius: 50%;
+  color: rgb(255, 255, 255);
+}
+
+@keyframes bellAnimation {
+  0% {
+    transform: translateY(0); /* Initial position */
+  }
+  100% {
+    transform: translateY(-5px); /* End position */
+  }
+}
+
+.welcome {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  margin-right: 140px;
+  font-weight: 1000;
+  font-size: 17px;
+}
+
+.ant-menu-item,
+.ant-menu-submenu-title {
+  font-weight: 1000;
+  font-size: 16.3px;
+}
