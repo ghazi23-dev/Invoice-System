@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuildingColumns, faCashRegister, faBuilding,faListUl,faMoneyBill,faUsers,faSackDollar,faCubesStacked,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar } 
+import { faBuildingColumns,faFileInvoiceDollar ,faCashRegister, faBuilding,faListUl,faMoneyBill,faUsers,faSackDollar,faCubesStacked,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar } 
   from '@fortawesome/free-solid-svg-icons';
 import { HomeOutlined, UsergroupDeleteOutlined,  SettingOutlined ,} from '@ant-design/icons';
 import './Sidebar.css';
@@ -56,6 +56,19 @@ useEffect(() => {
         <Link to="/Dashboard/Agence">Agence</Link>
       </Menu.Item>
             ) : null}
+
+{(isAdmin) ? (
+      <Menu.Item key="Facturation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
+        <Link to="/Dashboard/DashboardBi">Facturation</Link>
+      </Menu.Item>
+            ) : null}
+
+{(isAdmin) ? (
+      <Menu.Item key="Produit_Reservation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
+        <Link to="/Dashboard/Produit_Reservation">Produit Reservation</Link>
+      </Menu.Item>
+            ) : null}
+
       {(isAdmin) ? (
         <Menu.Item key="employer" icon={<UsergroupDeleteOutlined />}>
           <Link to="/Dashboard/Agent">Agent</Link>

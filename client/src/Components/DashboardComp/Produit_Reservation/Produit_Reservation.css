@@ -1,0 +1,12 @@
+.ag-header-cell {
+          font-size: 14px; /* Adjust as needed */
+         
+          color: black;
+      
+        }
+        .ag-theme-alpine .ag-header-cell {
+          font-size: 16px;
+          font-family: 'Sorona', sans-serif;
+         
+        }
+        

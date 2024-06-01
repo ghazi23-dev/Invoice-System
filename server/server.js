@@ -26,6 +26,10 @@ app.use(UserRouter);
 const AgencyRouter = require("./routes/AgencyRouter");
 app.use(AgencyRouter);
 
+/*/ PRODUCT ROUTER /*/
+const ProductRouter = require("./routes/ProduitRouter");
+app.use(ProductRouter);
+
 
 
 

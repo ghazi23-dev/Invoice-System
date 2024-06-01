@@ -1,12 +1,24 @@
-
 .sidebar {
-  height: 100vh;
+  overflow-y: auto;
+  width: auto;
+  height: auto;
+  overflow-x: hidden;
+  z-index: 1;
+  position: relative;
 }
 
+@media (min-width: 1500px) {
+  .sidebar {
+    overflow-y: hidden;
+  }
+}
 .content {
   height: auto;
+  width: 100%;
   padding: 3px;
   background-color: rgba(235, 235, 234, 0.281);
+  z-index: 0;
+  overflow-x: auto;
 }
 
 .logo {
@@ -42,8 +54,8 @@
 
 .toggle-theme-btn {
   position: absolute;
-  bottom: 20px;
-  left: 15px;
+  bottom: 8px;
+  left: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,8 +180,8 @@
   margin-left: 90px;
 }
 .notification-dialog .toast {
-  max-height:350px; /* Adjust this value based on the size of your messages */
-  overflow-y:scroll /* Add a scrollbar if the content overflows */
+  max-height: 350px; /* Adjust this value based on the size of your messages */
+  overflow-y: scroll; /* Add a scrollbar if the content overflows */
 }
 .CircleAlert {
   position: relative;

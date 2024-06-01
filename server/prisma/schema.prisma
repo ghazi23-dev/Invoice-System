@@ -1,86 +1,102 @@
 generator client {
-          provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-          provider = "mysql"
-          url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-          User_ID     Int      @id @default(autoincrement())
-          UserName    String
-          fullname    String
-          UserEmail   String   @unique
-          Role        String
-          Password    String
-          DateOfBirth String
-          tag_actif   Int      @default(1)
-          Agency_ID   Int?
-          created_at  DateTime @default(now())
-          Agencies    Agency[] @relation("UserToAgency")
-          AdminOf     Agency?  @relation("AdminToAgency")
+  User_ID     Int      @id @default(autoincrement())
+  UserName    String
+  fullname    String
+  UserEmail   String   @unique
+  Role        String
+  Password    String
+  DateOfBirth String
+  tag_actif   Int      @default(1)
+  Agency_ID   Int?
+  created_at  DateTime @default(now())
+  Agencies    Agency[] @relation("UserToAgency")
+  AdminOf     Agency?  @relation("AdminToAgency")
 }
 
 model Agency {
-          Agency_ID         Int      @id @default(autoincrement())
-          AgencyName        String
-          AgencyAddress     String
-          AgencyPhone       String
-          AgencyEmail       String
-          AgencyLocation    String
-          SuperAdminID      Int
-          Matricule_fiscale String
-          created_at        DateTime @default(now())
+  Agency_ID         Int      @id @default(autoincrement())
+  AgencyName        String
+  AgencyAddress     String
+  AgencyPhone       String
+  AgencyEmail       String
+  AgencyLocation    String
+  SuperAdminID      Int
+  Matricule_fiscale String
+  created_at        DateTime @default(now())
 
-          User    User     @relation("UserToAgency", fields: [SuperAdminID], references: [User_ID])
-          AdminID Int      @unique
-          Admin   User?    @relation("AdminToAgency", fields: [AdminID], references: [User_ID])
-          Clients Client[]
+  User    User     @relation("UserToAgency", fields: [SuperAdminID], references: [User_ID])
+  AdminID Int      @unique
+  Admin   User?    @relation("AdminToAgency", fields: [AdminID], references: [User_ID])
+  Clients Client[]
 }
 
 model Client {
-          Client_ID      Int     @id @default(autoincrement())
-          ClientName     String
-          ClientPhone    String
-          ClientEmail    String
-          ClientAddress  String
-          ClientLocation String
-          Agency_ID      Int
-          Agency         Agency  @relation(fields: [Agency_ID], references: [Agency_ID])
-          Orders         Order[]
-}
-
-model Order {
-          OrderID      Int       @id @default(autoincrement())
-          Client_ID    Int
-          OrderDetails String
-          Client       Client    @relation(fields: [Client_ID], references: [Client_ID])
-          Invoices     Invoice[]
-}
-
-model Invoice {
-          InvoiceID Int     @id @default(autoincrement())
-          OrderID   Int
-          Amount    Decimal
-          Order     Order   @relation(fields: [OrderID], references: [OrderID])
+  Client_ID      Int    @id @default(autoincrement())
+  ClientName     String
+  ClientPhone    String
+  ClientEmail    String
+  ClientAddress  String
+  ClientLocation String
+  Agency_ID      Int
+  Agency         Agency @relation(fields: [Agency_ID], references: [Agency_ID])
 }
 
 model Achat_Reservation {
-  AchatID               Int       @id @default(autoincrement())
-  DATE             DateTime
-  AGENT            String
-  DESIGNATION      String
-  PLATEFORME       String
-  NOM_CLIENT       String
-  CONTACT_CLIENT   String
-  DATE_ENTREE      DateTime
-  REGLEMENT        String
-  NUMERO_RECU      String
-  PRIX_VENTE       Float
-  PRIX_ACHAT       Float
-  AVANCE           Float
-  RESTE            Float
-  OBSERVATION      String?
+  AchatID        Int      @id @default(autoincrement())
+  DATE           DateTime
+  AGENT          String
+  DESIGNATION    String
+  PLATEFORME     String
+  NOM_CLIENT     String
+  CONTACT_CLIENT String
+  DATE_ENTREE    DateTime
+  REGLEMENT      String
+  NUMERO_RECU    String
+  PRIX_VENTE     Float
+  PRIX_ACHAT     Float
+  AVANCE         Float
+  RESTE          Float
+  OBSERVATION    String?
 }
 
+model Invoice {
+  InvoiceID       Int      @id @default(autoincrement())
+  invoiceNumber   String
+  customerName    String
+  invoiceDate     DateTime
+  dueDate         DateTime
+  status          String
+  referenceNumber String?
+  product         String
+  discountType    String
+  discountValue   Float
+  tax             String
+  bank            String
+  notes           String?
+  terms           String?
+  signatureName   String
+  signatureImage  String?
+  totalHT         Float
+  discount        Float
+  tva             Float
+  totalAmount     Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Product {
+  ProductID Int    @id @default(autoincrement())
+  Libelle   String
+  Type      String
+  Created_at DateTime @default(now())
+  Tva        Float
+}
