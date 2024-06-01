@@ -73,7 +73,7 @@ const InvoiceComponent = () => {
       const selectedProduct = ReservationProducts.find(product => product.ProductID === parseInt(value));
       if (selectedProduct) {
         const updatedProducts = products.map((product, index) => {
-          if (index === 0) { // Assuming you're updating the first product in the array
+          if (index >=0) { 
             return { ...product, tax: selectedProduct.Tva, name: selectedProduct.Libelle };
           }
           return product;
