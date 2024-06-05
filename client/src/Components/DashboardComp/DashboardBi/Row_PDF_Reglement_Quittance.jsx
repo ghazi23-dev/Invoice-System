@@ -19,6 +19,7 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
   const [profilSociete, setProfilSociete] = useState(null);
   const [localData, setLocalData] = useState("");
   const uniqueTaxes = [...new Set(record.Items.map((item) => item.Tax))];
+  const uniqueDiscounts =  [...new Set(record.Items.map((item) => item.Discount))];
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
 
   
@@ -237,20 +238,22 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                 <View style={styles.calculationTable}>
                   <View style={styles.calculationRow}>
                     <Text style={styles.calculationLabel}>Base TVA</Text>
+                    <Text style={styles.calculationLabel}>Remise</Text>
                     <Text style={styles.calculationLabel}>Taux TVA</Text>
                     <Text style={styles.calculationLabel}>Montant TVA</Text>
                   </View>
                   <View style={styles.calculationRow}>
-                    <Text style={styles.calculationValue}>
-                      {record.TotalHT}
-                    </Text>
-                    <Text style={styles.calculationValue}>
-                      {uniqueTaxes.join(", ")}%
-                    </Text>
-                    <Text style={styles.calculationValue}>{record.Tva}</Text>
-                  </View>
-                </View>
-              </View>
+      <Text style={styles.calculationValue}>{record.TotalHT}</Text>
+      {items.map((item, index) => (
+        <Text key={index} style={styles.calculationValue}>
+          {item.DiscountType === 'Percentage(%)' ? `${item.Discount}%` : `${Number(item.Discount).toFixed(3)} DT`}
+        </Text>
+      ))}
+      <Text style={styles.calculationValue}>{uniqueTaxes.join(", ")}%</Text>
+      <Text style={styles.calculationValue}>{Number(record.Tva).toFixed(3)}</Text>
+    </View>
+  </View>
+</View>
               
 
               <View style={styles.summaryContainer} wrap={false}>
@@ -260,11 +263,17 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                 <View style={styles.summaryBox}>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total HT:</Text>
-                    <Text style={styles.summaryValue}>{record.TotalHT}</Text>
+                    <Text style={styles.summaryValue}>{Number(record.TotalHT).toFixed(3)}</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Remise:</Text>
+                    <Text style={styles.summaryValue}>
+                    {Number(record.Discount).toFixed(3)}
+                    </Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total TVA:</Text>
-                    <Text style={styles.summaryValue}>{record.Tva}</Text>
+                    <Text style={styles.summaryValue}>{Number(record.Tva).toFixed(3)}</Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Timbre Fiscal:</Text>
