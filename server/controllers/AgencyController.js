@@ -12,7 +12,6 @@ static async createAgency(req, res) {
       AgencyEmail,
       AgencyLocation,
       SuperAdminID,
-      AdminID,
       Matricule_fiscale,
      
     } = req.body;
@@ -24,7 +23,6 @@ static async createAgency(req, res) {
         AgencyEmail,
         AgencyLocation,
         SuperAdminID,
-        AdminID,
         Matricule_fiscale,
        
       );

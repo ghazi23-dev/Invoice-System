@@ -11,7 +11,6 @@ class AgencyModel {
                     AgencyEmail,
                     AgencyLocation,
                     SuperAdminID,
-                    AdminID,
                     Matricule_fiscale,
                     
                   ) {
@@ -24,7 +23,6 @@ class AgencyModel {
                           AgencyEmail: AgencyEmail,
                           AgencyLocation: AgencyLocation,
                           SuperAdminID: parseInt(SuperAdminID, 10),
-                          AdminID: parseInt(AdminID, 10),
                           Matricule_fiscale: Matricule_fiscale,
                           created_at: new Date(),
                         },
@@ -68,17 +66,17 @@ class AgencyModel {
                     }
                     
                     
-                 static async createAchatReservation(data) {
+                    static async createAchatReservation(data) {
                       try {
                         const createdReservation = await prisma.achat_Reservation.create({
                           data: {
-                            DATE: data.DATE,
+                            DATE: new Date(data.DATE).toISOString(), // Convert to ISO 8601 format
                             AGENT: data.AGENT,
                             DESIGNATION: data.DESIGNATION,
                             PLATEFORME: data.PLATEFORME,
                             NOM_CLIENT: data.NOM_CLIENT,
                             CONTACT_CLIENT: data.CONTACT_CLIENT,
-                            DATE_ENTREE: data.DATE_ENTREE,
+                            DATE_ENTREE: new Date(data.DATE_ENTREE).toISOString(), // Convert to ISO 8601 format
                             REGLEMENT: data.REGLEMENT,
                             NUMERO_RECU: data.NUMERO_RECU,
                             PRIX_VENTE: data.PRIX_VENTE,
@@ -94,7 +92,7 @@ class AgencyModel {
                         throw error;
                       }
                     }
-
+                    
                   
 
           static async getallAchatReservations() {
@@ -114,13 +112,12 @@ class AgencyModel {
                             AchatID: parseInt(AchatID),
                           },
                           data: {
-                            DATE: data.DATE,
-                            AGENT: data.AGENT,
+                            DATE: new Date(data.DATE).toISOString(), // Convert to ISO 8601 format                            AGENT: data.AGENT,
                             DESIGNATION: data.DESIGNATION,
                             PLATEFORME: data.PLATEFORME,
                             NOM_CLIENT: data.NOM_CLIENT,
                             CONTACT_CLIENT: data.CONTACT_CLIENT,
-                            DATE_ENTREE: data.DATE_ENTREE,
+                            DATE_ENTREE: new Date(data.DATE_ENTREE).toISOString(), // Convert to ISO 8601 format
                             REGLEMENT: data.REGLEMENT,
                             NUMERO_RECU: data.NUMERO_RECU,
                             PRIX_VENTE: data.PRIX_VENTE,
@@ -135,6 +132,11 @@ class AgencyModel {
                         console.error('Error updating Achat Reservation:', error);
                         throw error;
                       }
+                    }
+
+                    static async getInvoicebyID(){
+
+                      
                     }
                     
 

@@ -9,48 +9,46 @@ const { Option } = Select;
 import "./Agence.css";
 const AgenceForm = ({ isOpen, onClose, userData }) => {
   const [open, setOpen] = useState(isOpen);
-const [SuperAdminData, setSuperAdminData] = useState([]);
-
- 
+  const [SuperAdminData, setSuperAdminData] = useState([]);
 
   const validationSchema = Yup.object().shape({
     id_users: Yup.string().required("ID Required"),
     fullname: Yup.string().required("Nom Agent Required"),
     UserName: Yup.string().required("Nom d`utilisateur Required"),
-    email: Yup.string().email("Invalid email address").required("Email Required"),    
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email Required"),
     password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password Required"),
+      .min(8, "Password must be at least 8 characters")
+      .required("Password Required"),
     password2: Yup.string()
-    .oneOf([Yup.ref('Password'), null], 'Passwords must match')
-    .required('Password Confirmation Required'),    
+      .oneOf([Yup.ref("Password"), null], "Passwords must match")
+      .required("Password Confirmation Required"),
     role: Yup.string().required("Role Required"),
     num_cin: Yup.string()
-    .min(8, "Numéro CIN must be at least 8 characters") 
-    .max(10, "Numéro CIN must be at most 10 characters")
-    .required("Numéro CIN Required"), 
-      date_naissance: Yup.date().required("Date de Naissance Required"),
-
+      .min(8, "Numéro CIN must be at least 8 characters")
+      .max(10, "Numéro CIN must be at most 10 characters")
+      .required("Numéro CIN Required"),
+    date_naissance: Yup.date().required("Date de Naissance Required"),
   });
 
   const formik = useFormik({
     initialValues: {
-      AgencyName : "",  
-      AgencyAddress : "",  
-      AgencyPhone : "",  
-      AgencyEmail : "",  
-      AgencyLocation : "",  
-      SuperAdminID : "",  
-      Matricule_fiscale : "",  
-      superadmins : "",  
-
+      AgencyName: "",
+      AgencyAddress: "",
+      AgencyPhone: "",
+      AgencyEmail: "",
+      AgencyLocation: "",
+      SuperAdminID: "",
+      Matricule_fiscale: "",
+      superadmins: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       console.log(values);
     },
   });
- 
+
   useEffect(() => {
     if (userData) {
       formik.setValues({
@@ -60,110 +58,28 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
         AgencyPhone: userData.AgencyPhone,
         AgencyEmail: userData.AgencyEmail,
         AgencyLocation: userData.AgencyLocation,
-        SuperAdminID: userData.SuperAdminID,
+        superadmins: userData.SuperAdminID,
         Matricule_fiscale: userData.Matricule_fiscale,
-        superadmins: userData.Admin.fullname,
-
+        
       });
     }
   }, [userData]);
-  
-
-  
 
   const fetchSuperAdmins = async () => {
-          try {
-            const response = await axiosInstance.get(
-              "/api/v1/getSuperAdmin"
-            );
-            console.log("Response from server:", response.data);
-            setSuperAdminData(response.data);
-          } catch (error) {
-            console.error("Error fetching data from server:", error);
-          }
-        };
-
-          useEffect(() => {
-                    fetchSuperAdmins();
-                      }, []);
-
-  const handleOk = async (close) => {
-    console.log(close);
-
-
- 
-    if (!formik.values.UserName || !formik.values.fullname || !formik.values.UserEmail || !formik.values.Password || !formik.values.Role || !formik.values.DateOfBirth){
-      return;
-    }
-    
     try {
-      let response;
-      if (!userData) {
-        response = await axiosInstance.post("/api/v1/adduser", {
-          UserName: formik.values.UserName,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Password: formik.values.Password !== "" ? formik.values.Password : undefined,
-          Role: formik.values.Role,
-          DateOfBirth: formik.values.DateOfBirth,
-          
-        });
-      } else {
-        // Updating an existing user
-        const updateData = {
-          User_ID: formik.values.User_ID,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Role: formik.values.Role,
-          num_cin: formik.values.num_cin,
-          DateOfBirth: formik.values.DateOfBirth,
-        };
-      
-       
-        if (formik.touched.Password && formik.values.Password !== "") {
-          // If modified, hash the new password
-          updateData.Password = formik.values.Password;
-        }
-        console.log("Update Data:", updateData);
-        // Include the updated fields in the request
-        response = await axiosInstance.put(
-          "/api/v1/updateuser",
-          updateData
-        );
-      }
-
+      const response = await axiosInstance.get("/api/v1/getSuperAdmin");
       console.log("Response from server:", response.data);
-
-      if (response.data.message) {
-        toast.success(response.data.message);
-    } else if (response.data.error) {
-        toast.error(response.data.error);
-    }
-    
+      setSuperAdminData(response.data);
     } catch (error) {
-      if (error.response && error.response.data) {
-        if (error.response.data === "User Already Exists" || error.response.data === "User with this email already exists") {
-          toast.error(error.response.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error.response);
-        }
-      } else if (error.data) {
-        if (error.data === "User Already Exists" || error.data === "User with this email already exists") {
-          toast.error(error.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error);
-        }
-      } else {
-        toast.error("An unknown error occurred");
-        console.error("Error:", error);
-      }
-    } finally {
-      setOpen(false);
-      onClose();
+      console.error("Error fetching data from server:", error);
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchSuperAdmins();
+  }, []);
+
+
   const handleCancel = (e) => {
     console.log(e);
     setOpen(false);
@@ -171,19 +87,10 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
   };
 
   const filterOption = (input, option) =>
-          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-
-
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 
   return (
-    <Modal
-      title="Agence:"
-      open={open}
-     footer={null}
-      onCancel={handleCancel}
-    >
-      
-
+    <Modal title="Agence:" open={open} footer={null} onCancel={handleCancel}>
       <div>
         <label>Agency ID:</label>
         <Input
@@ -191,7 +98,7 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           name="Agency_ID"
-          style={{ color: "green" ,fontFamily: "bold", fontWeight: 1000 }} 
+          style={{ color: "green", fontFamily: "bold", fontWeight: 1000 }}
           disabled
         />
       </div>
@@ -202,7 +109,6 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           name="AgencyName"
-          
           style={
             formik.touched.AgencyName && formik.errors.AgencyName
               ? { borderColor: "red" }
@@ -214,7 +120,6 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
             {formik.errors.AgencyName}
           </span>
         ) : null}
-        
       </div>
       <div>
         <label>Adresse de l`Agence:</label>
@@ -296,9 +201,9 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
       <div>
         <label>Super Admin:</label>
         <Select
-        showSearch
-        placeholder="Select Super Admin"
-        optionFilterProp="children"
+          showSearch
+          placeholder="Select Super Admin"
+          optionFilterProp="children"
           filterOption={filterOption}
           value={formik.values.superadmins}
           onChange={(value) => formik.setFieldValue("superadmins", value)}
@@ -306,10 +211,11 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
           name="superadmins"
           style={{ width: "100%" }}
           className={
-            formik.touched.superadmins && formik.errors.superadmins ? "select-error" : ""
+            formik.touched.superadmins && formik.errors.superadmins
+              ? "select-error"
+              : ""
           }
         >
-
           {SuperAdminData.map((superadmins, index) => (
             <Option key={index} value={superadmins.User_ID}>
               {superadmins.fullname}
@@ -327,8 +233,7 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
         ) : null}
       </div>
 
-
-        <div>
+      <div>
         <label>Matricule Fiscale:</label>
         <Input
           value={formik.values.Matricule_fiscale}
@@ -347,13 +252,6 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
           </span>
         ) : null}
       </div>
-
-      
-
-
-
-
-
     </Modal>
   );
 };

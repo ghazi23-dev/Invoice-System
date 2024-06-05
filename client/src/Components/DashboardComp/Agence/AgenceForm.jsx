@@ -60,9 +60,9 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
         AgencyPhone: userData.AgencyPhone,
         AgencyEmail: userData.AgencyEmail,
         AgencyLocation: userData.AgencyLocation,
-        SuperAdminID: userData.SuperAdminID,
+        superadmins: userData.SuperAdminID,
         Matricule_fiscale: userData.Matricule_fiscale,
-        superadmins: userData.Admin.fullname,
+       
 
       });
     }
@@ -76,8 +76,9 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
             const response = await axiosInstance.get(
               "/api/v1/getSuperAdmin"
             );
-            console.log("Response from server:", response.data);
+            console.log("Response from server Admin ID:", response.data);
             setSuperAdminData(response.data);
+            console.log("Super Admin Data ID:", SuperAdminData[0].User_ID);
           } catch (error) {
             console.error("Error fetching data from server:", error);
           }
@@ -87,83 +88,44 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
                     fetchSuperAdmins();
                       }, []);
 
-  const handleOk = async (close) => {
-    console.log(close);
-
-
- 
-    if (!formik.values.UserName || !formik.values.fullname || !formik.values.UserEmail || !formik.values.Password || !formik.values.Role || !formik.values.DateOfBirth){
-      return;
-    }
-    
-    try {
-      let response;
-      if (!userData) {
-        response = await axiosInstance.post("/api/v1/adduser", {
-          UserName: formik.values.UserName,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Password: formik.values.Password !== "" ? formik.values.Password : undefined,
-          Role: formik.values.Role,
-          DateOfBirth: formik.values.DateOfBirth,
-          
-        });
-      } else {
-        // Updating an existing user
-        const updateData = {
-          User_ID: formik.values.User_ID,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Role: formik.values.Role,
-          num_cin: formik.values.num_cin,
-          DateOfBirth: formik.values.DateOfBirth,
-        };
-      
-       
-        if (formik.touched.Password && formik.values.Password !== "") {
-          // If modified, hash the new password
-          updateData.Password = formik.values.Password;
-        }
-        console.log("Update Data:", updateData);
-        // Include the updated fields in the request
-        response = await axiosInstance.put(
-          "/api/v1/updateuser",
-          updateData
-        );
-      }
-
-      console.log("Response from server:", response.data);
-
-      if (response.data.message) {
-        toast.success(response.data.message);
-    } else if (response.data.error) {
-        toast.error(response.data.error);
-    }
-    
-    } catch (error) {
-      if (error.response && error.response.data) {
-        if (error.response.data === "User Already Exists" || error.response.data === "User with this email already exists") {
-          toast.error(error.response.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error.response);
-        }
-      } else if (error.data) {
-        if (error.data === "User Already Exists" || error.data === "User with this email already exists") {
-          toast.error(error.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error);
-        }
-      } else {
-        toast.error("An unknown error occurred");
-        console.error("Error:", error);
-      }
-    } finally {
-      setOpen(false);
-      onClose();
-    }
-  }
+                      const handleOk = async (close) => {
+                        console.log(close);
+                      
+                        if (!formik.values.AgencyName || !formik.values.AgencyAddress || !formik.values.AgencyPhone || !formik.values.AgencyEmail || !formik.values.AgencyLocation || !formik.values.Matricule_fiscale) {
+                          return;
+                        }
+                      
+                        try {
+                          let response;
+                          if (!userData) {
+                            response = await axiosInstance.post("/api/v1/createAgency", {
+                              AgencyName: formik.values.AgencyName,
+                              AgencyAddress: formik.values.AgencyAddress,
+                              AgencyPhone: formik.values.AgencyPhone,
+                              AgencyEmail: formik.values.AgencyEmail,
+                              AgencyLocation: formik.values.AgencyLocation,
+                              SuperAdminID: formik.values.superadmins,
+                              Matricule_fiscale: formik.values.Matricule_fiscale,
+                            });
+                      
+                            console.log("Response from server:", response.data);
+                      
+                            if (response.data.success) {
+                              toast.success("Agency created successfully");
+                             
+                            } else {
+                              toast.error("Failed to create Agency");
+                            }
+                          }
+                        } catch (error) {
+                          console.error("Error creating Agency:", error);
+                          toast.error("Failed to create Agency");
+                        } finally {
+                          setOpen(false);
+                          onClose();
+                        }
+                      }
+                      
   const handleCancel = (e) => {
     console.log(e);
     setOpen(false);
@@ -332,7 +294,7 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
           value={formik.values.Matricule_fiscale}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          name="SuperAdminID"
+          name="Matricule_fiscale"
           style={
             formik.touched.Matricule_fiscale && formik.errors.Matricule_fiscale
               ? { borderColor: "red" }

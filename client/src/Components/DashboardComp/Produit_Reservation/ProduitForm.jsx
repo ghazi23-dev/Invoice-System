@@ -52,15 +52,15 @@ const ProduitForm = ({ isOpen, onClose, userData }) => {
     console.log(close);
 
     
+await formik.handleSubmit();
+if (
+  formik.values.Libelle === undefined ||
+  formik.values.Type === undefined ||
+  formik.values.Tva === undefined
+) {
+  return;
+}
 
-    if (
-      !formik.values.Libelle ||
-      !formik.values.Type ||
-      !formik.values.Tva
-     
-    ) {
-      return;
-    }
 
     try {
       let response;

@@ -24,6 +24,7 @@ import Agent from "../DashboardComp/Agents/Agent";
 import Agence from "../DashboardComp/Agence/Agence";
 import Facturation from "../DashboardComp/DashboardBi/InvoiceComponent";
 import Produit_Reservation from "../DashboardComp/Produit_Reservation/Produit_Reservation";
+import Invoice_List from "../DashboardComp/DashboardBi/InvoiceList";
 const SideBar = () => {
   const { Header, Sider, Content } = Layout;
   const [darkTheme, setDarkTheme] = useState(true);
@@ -186,7 +187,9 @@ const SideBar = () => {
             <Route path="/Agence" element={<PrivateRoute element={<Agence />} roles={['Owner']} />} />
             <Route path="/DashboardBi" element={<PrivateRoute element={<Facturation />} roles={['Owner']} />} />
             <Route path="/Produit_Reservation" element={<PrivateRoute element={<Produit_Reservation />} roles={['Owner']} />} />
-            {/* <Route path="*" element={<Dashboard/>} /> */}
+            
+            <Route path="/ListeFacture" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
+         {/* <Route path="*" element={<Dashboard/>} /> */}
           </Routes>
         </Content>
       </Layout>

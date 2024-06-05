@@ -30,6 +30,10 @@ app.use(AgencyRouter);
 const ProductRouter = require("./routes/ProduitRouter");
 app.use(ProductRouter);
 
+/*/ INVOICE ROUTER /*/
+const InvoiceRouter = require("./routes/InvoiceRouter");
+app.use(InvoiceRouter);
+
 
 
 

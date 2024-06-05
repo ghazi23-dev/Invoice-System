@@ -64,6 +64,12 @@ useEffect(() => {
             ) : null}
 
 {(isAdmin) ? (
+      <Menu.Item key="Facturation_List"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
+        <Link to="/Dashboard/ListeFacture">Liste Facture</Link>
+      </Menu.Item>
+            ) : null}
+
+{(isAdmin) ? (
       <Menu.Item key="Produit_Reservation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
         <Link to="/Dashboard/Produit_Reservation">Produit Reservation</Link>
       </Menu.Item>

@@ -11,8 +11,7 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 faSave,
-faPlugCirclePlus,
-faPlus,
+
 faPlusCircle,
 } from "@fortawesome/free-solid-svg-icons";
 const Dashboard = () => {
@@ -22,14 +21,22 @@ const Dashboard = () => {
     fetchData();
     handleupdate ();
   }, []);
-
+  const formatDate = (dateString) => {
+    return dateString.split('T')[0]; // Extract only the date part
+  };
   const fetchData = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/getallAchatReservations");
       console.log("Response from server Achat Reservation:", response.data);
       // Check if achatReservations is an array
       if (Array.isArray(response.data?.achatReservations)) {
-        setData(response.data.achatReservations); // Set the array as rowData
+        // Format the dates
+        const formattedData = response.data.achatReservations.map(row => ({
+          ...row,
+          DATE: formatDate(row.DATE),
+          DATE_ENTREE: formatDate(row.DATE_ENTREE),
+        }));
+        setData(formattedData); // Set the formatted data
       } else {
         console.error("achatReservations is not an array:", response.data?.achatReservations);
       }
@@ -37,6 +44,7 @@ const Dashboard = () => {
       console.error("Error fetching data from server:", error);
     }
   };
+  
 
   
 
@@ -72,11 +80,14 @@ const Dashboard = () => {
   };
 
   const handleCellValueChanged = ({ data, oldValue, newValue }) => {
+    if (data.isNew) {
+      // Skip updating the row if it is a new row
+      return;
+    }
     if (oldValue !== newValue) {
       updateRow(data);
     }
   };
-  
   
 
   const [columnDefs] = useState([
@@ -156,6 +167,7 @@ const handleupdate = async () => {
   
     try {
       // Send a POST request for each new row
+      
       for (const row of newRows) {
         await axiosInstance.post('/api/v1/createAchatReservation', row);
       }
