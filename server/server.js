@@ -34,6 +34,10 @@ app.use(ProductRouter);
 const InvoiceRouter = require("./routes/InvoiceRouter");
 app.use(InvoiceRouter);
 
+/*/ CLIENT ROUTER /*/
+const ClientRouter = require("./routes/ClientRouter");
+app.use(ClientRouter);
+
 
 
 

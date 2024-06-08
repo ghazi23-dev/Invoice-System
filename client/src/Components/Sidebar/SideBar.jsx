@@ -25,6 +25,8 @@ import Agence from "../DashboardComp/Agence/Agence";
 import Facturation from "../DashboardComp/DashboardBi/InvoiceComponent";
 import Produit_Reservation from "../DashboardComp/Produit_Reservation/Produit_Reservation";
 import Invoice_List from "../DashboardComp/DashboardBi/InvoiceList";
+import ClientTiers from "../DashboardComp/ClientTiers/Client";
+import InvoiceViewForm from "../DashboardComp/DashboardBi/InvoiceViewComponent"
 const SideBar = () => {
   const { Header, Sider, Content } = Layout;
   const [darkTheme, setDarkTheme] = useState(true);
@@ -189,6 +191,9 @@ const SideBar = () => {
             <Route path="/Produit_Reservation" element={<PrivateRoute element={<Produit_Reservation />} roles={['Owner']} />} />
             
             <Route path="/ListeFacture" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
+            <Route path="/Client" element={<PrivateRoute element={<ClientTiers />} roles={['Owner']} />} />
+            <Route path="/FactureView/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
+        
          {/* <Route path="*" element={<Dashboard/>} /> */}
           </Routes>
         </Content>

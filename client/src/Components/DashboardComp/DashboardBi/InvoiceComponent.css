@@ -155,3 +155,7 @@
           margin-top: -130px; /* Adjust this value as needed */
           padding: 10px;
         }
+        .select-error .ant-select-selector {
+            border-color: red !important;
+          }
+          

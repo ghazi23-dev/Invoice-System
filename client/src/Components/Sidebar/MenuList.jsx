@@ -57,11 +57,29 @@ useEffect(() => {
       </Menu.Item>
             ) : null}
 
+            
+
+{(isAdmin) ? (
+      <Menu.Item key="Client"icon={<FontAwesomeIcon icon={faBuilding} />} >
+        <Link to="/Dashboard/Client">Client</Link>
+      </Menu.Item>
+            ) : null}
+
+
+
 {(isAdmin) ? (
       <Menu.Item key="Facturation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
         <Link to="/Dashboard/DashboardBi">Facturation</Link>
       </Menu.Item>
             ) : null}
+
+            {(isAdmin) ? (
+      <Menu.Item key="FacturationID"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
+        <Link to="/Dashboard/FactureView/:InvoiceID">View INV</Link>
+      </Menu.Item>
+            ) : null}
+
+            
 
 {(isAdmin) ? (
       <Menu.Item key="Facturation_List"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >

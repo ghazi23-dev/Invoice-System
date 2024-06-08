@@ -39,15 +39,9 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
     if (userDetails) {
-      const { User_ID, UserName, fullname, Role, Password } = userDetails;
+      const {fullname, } = userDetails;
 
-      console.log("User details From Local Storage Invoice:", {
-        User_ID,
-        UserName,
-        fullname,
-        Role,
-        Password,
-      });
+      
       setLocalData(fullname);
     }
   }, []);
@@ -106,28 +100,28 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
 
   
   const toWords = new ToWords({
-    localeCode: "fr-FR",
+    localeCode: 'fr-FR',
     converterOptions: {
-      currency: true,
-      ignoreDecimal: false,
-      ignoreZeroCurrency: false,
-      doNotAddOnly: false,
-      currencyOptions: {
-        // can be used to override defaults for the selected locale
-        name: "Tunisian Dinar",
-        plural: "Dinars",
-        symbol: "DT",
-        fractionalUnit: {
-          name: "Millime",
-          plural: "Millimes",
-          symbol: "",
+        currency: true,
+        ignoreDecimal: true,
+        ignoreZeroCurrency: false,
+        doNotAddOnly: false,
+        currencyOptions: {
+            // can be used to override defaults for the selected locale
+            name: 'Dinar',
+            plural: 'Dinars',
+            symbol: 'TND',
+            fractionalUnit: {
+                name: 'Millime',
+                plural: 'Millimes',
+                symbol: '',
+            },
         },
-      },
     },
-  });
+});
 
   return (
-    <Document title={`Invoice N° : ${record.InvoiceID}`}>
+    <Document title={`Facture N°: ${record.invoiceNumber}`}>
       {itemsPages.map((items, pageIndex) => (
         <Page
           key={pageIndex}
@@ -164,15 +158,19 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                   <Text style={styles.value}>MF179874/000/M/R</Text>
                 </View>
                 <View style={styles.detailsColumn}>
-                  <Text style={styles.label}>Client:</Text>
-                  <Text style={styles.value}>{record.ClientName}</Text>
-                  <Text style={styles.label}>Adresse:</Text>
-                  <Text style={styles.value}>{record.ClientAddress}</Text>
-                  <Text style={styles.label}>MF:</Text>
-                  <Text style={styles.value}>{record.ClientMF}</Text>
+                  {/* <Text style={styles.label}>Name</Text> */}
+                  <Text style={styles.value}>{record.client.ClientName}</Text>
+                  {/* <Text style={styles.label}>Adresse:</Text> */}
+                  <Text style={styles.value}>{record.client.ClientAddress}</Text>
+                  {/* <Text style={styles.label}>MF:</Text> */}
+                  {/* <Text style={styles.value}>{record.client.ClientEmail}</Text> */}
 
-                  <Text style={styles.label}>Tel:</Text>
-                  <Text style={styles.value}>{record.ClientPhone}</Text>
+
+                  {/* <Text style={styles.label}>Tel:</Text> */}
+                  <Text style={styles.value}>{record.client.ClientLocation}</Text>
+                  {/* <Text style={styles.label}>MF:</Text> */}
+                  <Text style={styles.value}>{record.client.Matricule_fiscale}</Text>
+
                 </View>
               </View>
               
@@ -243,23 +241,30 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                     <Text style={styles.calculationLabel}>Montant TVA</Text>
                   </View>
                   <View style={styles.calculationRow}>
-      <Text style={styles.calculationValue}>{record.TotalHT}</Text>
-      {items.map((item, index) => (
-        <Text key={index} style={styles.calculationValue}>
-          {item.DiscountType === 'Percentage(%)' ? `${item.Discount}%` : `${Number(item.Discount).toFixed(3)} DT`}
+                    <Text style={styles.calculationValue}>
+                      {Number(record.TotalHT).toFixed(3)}
+                    </Text>
+                    <Text style={styles.calculationValue}>
+                    {[...new Set(record.Items.map((item) => {
+            if (item.DiscountType === "Percentage(%)") {
+              return `${item.Discount}%`;
+            } else if (item.DiscountType === "Flat") {
+              return `${Number(item.Discount).toFixed(3)} DT`;
+            }
+            return null;
+          }))].filter(Boolean).join(", ")}
         </Text>
-      ))}
-      <Text style={styles.calculationValue}>{uniqueTaxes.join(", ")}%</Text>
-      <Text style={styles.calculationValue}>{Number(record.Tva).toFixed(3)}</Text>
-    </View>
-  </View>
-</View>
+        <Text style={styles.calculationValue}>
+          {uniqueTaxes.join(", ")}%
+                    </Text>
+                    <Text style={styles.calculationValue}>{Number(record.Tva).toFixed(3)}</Text>
+                  </View>
+                </View>
+              </View>
               
 
               <View style={styles.summaryContainer} wrap={false}>
-              {qrCodeDataUrl && (
-                  <Image src={qrCodeDataUrl} style={styles.qrCodeDownLeft} />
-                )}
+              
                 <View style={styles.summaryBox}>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total HT:</Text>
@@ -268,7 +273,7 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Remise:</Text>
                     <Text style={styles.summaryValue}>
-                    {Number(record.Discount).toFixed(3)}
+                      {Number(record.Discount).toFixed(3)}
                     </Text>
                   </View>
                   <View style={styles.summaryRow}>
@@ -291,7 +296,8 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
               </View>
               <Text style={styles.footerTextNumber}>
                 Arrêtée la présente facture à la somme de:{" "}
-                {toWords.convert(amount)}
+                {toWords.convert(amount , { currency: true }) + " et " + (amount % 1).toFixed(3).substring(2)} millimes
+
               </Text>
             </>
           )}
@@ -370,6 +376,7 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#f0f0f0",
     border: "1px solid #bfbfbf",
+    height: "100%",
   },
   label: {
     fontSize: 10,
@@ -379,6 +386,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
    fontFamily: "Nunito",
    fontWeight: "bold",
+   marginBottom: 10,
   },
   table: {
     display: "table",

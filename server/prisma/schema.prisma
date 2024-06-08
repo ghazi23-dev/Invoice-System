@@ -36,18 +36,19 @@ model Agency {
   User    User     @relation("UserToAgency", fields: [SuperAdminID], references: [User_ID])
   AdminID Int?     @unique
   Admin   User?    @relation("AdminToAgency", fields: [AdminID], references: [User_ID])
-  Clients Client[]
+
 }
 
 model Client {
-  Client_ID      Int    @id @default(autoincrement())
-  ClientName     String
-  ClientPhone    String
-  ClientEmail    String
-  ClientAddress  String
-  ClientLocation String
-  Agency_ID      Int
-  Agency         Agency @relation(fields: [Agency_ID], references: [Agency_ID])
+  Client_ID         Int       @id @default(autoincrement())
+  ClientName        String
+  ClientPhone       String
+  ClientEmail       String
+  ClientAddress     String
+  ClientLocation    String
+  Matricule_fiscale String
+  created_at        DateTime  @default(now())
+  invoices          Invoice[] // One-to-many relationship with Invoice
 }
 
 model Achat_Reservation {
@@ -103,9 +104,11 @@ model Invoice {
   UpdatedAt          DateTime       @default(now()) @updatedAt @map("UpdatedAt")
   Items              InvoiceItems[]
 
+  clientId           Int
+  client             Client         @relation(fields: [clientId], references: [Client_ID])
+
   @@map("Invoice")
 }
-
 model InvoiceItems {
   InvoiceItemID     Int      @id @default(autoincrement())
   InvoiceID         Int

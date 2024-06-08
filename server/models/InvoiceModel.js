@@ -21,6 +21,7 @@ class InvoiceModel {
                           Tva: data.Tva,
                           Timbre_Fiscal: data.Timbre_Fiscal,
                           TotalAmount: data.TotalAmount,
+                          clientId: data.clientId,
                           Items: {
                             create: data.Items.map(item => ({
                               ProductID: item.ProductID,
@@ -78,6 +79,7 @@ class InvoiceModel {
                       const invoices = await prisma.invoice.findMany({
                         include: {
                           Items: true,
+                          client: true,
                         },
                       });
                       return invoices;
