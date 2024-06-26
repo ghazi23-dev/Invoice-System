@@ -72,7 +72,7 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
   Timbre Fiscal: ${Number(record.Timbre_Fiscal).toFixed(3)},
   Agent de Saisie: ${localData},
   Date de Saisie: ${formatDate(record.CreatedAt)},
-  Systeme de Facturation: GSoft Innovations: Contacter Nous: https://www.linkedin.com/in/ghazi-smach/ 
+  Systeme de Facturation: GSoft Innovations: Contacter Nous: https://www.linkedin.com/in/ghazi-smach/ & 
   
 
 

@@ -2,17 +2,16 @@ import { useState } from "react";
 import "./Login.css";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
-import * as Yup from 'yup';
+import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../Auth/AxiosInstance";
 import LogoGS from "../../assets/GSoft.png";
-import {Button} from 'antd';
+import { Button } from "antd";
+import CountUp from "react-countup";
 
-export default function Login (){
+export default function Login() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-
 
   const formik = useFormik({
     initialValues: {
@@ -21,31 +20,27 @@ export default function Login (){
     },
     validationSchema: Yup.object({
       UserEmail: Yup.string()
-        .email('Invalid email address')
-        .required('Required Email!'),
+        .email("Invalid email address")
+        .required("Required Email!"),
       Password: Yup.string()
-        .min(8, 'Must be 8 characters or more')
-        .required('Required Password!'),
+        .min(8, "Must be 8 characters or more")
+        .required("Required Password!"),
     }),
     onSubmit: async (values) => {
- 
       axiosInstance.defaults.withCredentials = true;
       try {
         setIsLoading(true);
         await axiosInstance.post(`/api/v1/login`, values).then((res) => {
-          console.log("DATA BACK FROM LOGIN",res.data);
-   
-        }
-      
-      );
-        
+          console.log("DATA BACK FROM LOGIN", res.data);
+        });
+
         setTimeout(() => {
           toast.success("Login Success!");
-        },200);
+        }, 200);
         formik.resetForm();
         setTimeout(() => {
           setIsLoading(false);
-          navigate("/Dashboard/Home"); 
+          navigate("/Dashboard/Home");
           // Check if fetchStockNotif has already been run
           const notifMarked = localStorage.getItem("NotifMarked");
           if (notifMarked !== "true") {
@@ -53,44 +48,52 @@ export default function Login (){
             localStorage.setItem("NotifMarked", "false");
           }
         }, 1500);
-    
       } catch (err) {
         console.log(err);
         setIsLoading(false);
         if (err.response && err.response.data && err.response.data.error) {
           if (err.response.data.error === "User is deactivated") {
-          toast.warn("User not activated. Please Contact Your Administrator.");
-          return;
+            toast.warn(
+              "User not activated. Please Contact Your Administrator."
+            );
+            return;
+          }
+          toast.error("Verify Your Information.");
         }
-        toast.error("Verify Your Information.");
       }
-    }
     },
   });
-    
+
+  const SignUpNavigation = () => {
+    navigate("/Signup");
+  };
 
   return (
     <div className="login-container">
       <div className="left-section">
-     
-       <div className="image-container">
+        <div className="image-container">
           <img src={LogoGS} alt="Logo" />
         </div>
-        <p>GSoft Innovations vous offre une solution complète pour la gestion de vos facturations</p> 
-          <p>Simplifiez votre processus de facturation avec notre application innovante.</p>     
+        <p>
+          GSoft Innovations vous offre une solution complète pour la gestion de
+          vos facturations
+        </p>
+        <p>
+          Simplifiez votre processus de facturation avec notre application
+          innovante.
+        </p>
         <div className="stats">
-        
           <div>
-          <span>574K+</span>
-          <span>Factures Traitée</span>
+            <CountUp end={574000} duration={2.5} />
+            <span>Factures Traitée</span>
           </div>
           <div>
-          <span>335+</span>
-          <span>Clients Satisfaits</span>
+            <CountUp end={335} duration={2.5} suffix="+" />
+            <span>Clients Satisfaits</span>
           </div>
           <div>
-          <span>239M</span>
-          <span>Transactions</span>
+            <CountUp end={239000} duration={2.5} suffix="M" />
+            <span>Transactions</span>
           </div>
         </div>
         {/* <button className="register-button">Inscription Gratuite</button> */}
@@ -107,42 +110,80 @@ export default function Login (){
       </div>
       <div className="right-section">
         <h1>Se connecter</h1>
-       
+
         <form onSubmit={formik.handleSubmit}>
-          <input 
-            type="email"
-            placeholder="Nom d'utilisateur"
-            name="UserEmail"
-            onChange={formik.handleChange}
-            value={formik.values.UserEmail}
-            icon="user"
-            
-          />
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <input
+              type="email"
+              placeholder="Email"
+              name="UserEmail"
+              onChange={formik.handleChange}
+              value={formik.values.UserEmail}
+              style={{
+                paddingLeft: "35px",
+              }}
+            />
+            <i
+              className="fas fa-envelope"
+              style={{
+                position: "absolute",
+                left: "10px",
+                top: "42%",
+                transform: "translateY(-50%)",
+                pointerEvents: "none", // Prevent clicking the icon
+                color: "#aaa",
+                fontSize: "18px",
+              }}
+            />
+          </div>
           {formik.touched.UserEmail && formik.errors.UserEmail ? (
             <div className="error-message"> {formik.errors.UserEmail}</div>
           ) : null}
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            name="Password"
-            onChange={formik.handleChange}
-            value={formik.values.Password}
-            icon="lock"
-            
-          />
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <input
+              type="password"
+              placeholder="Mot de passe"
+              name="Password"
+              onChange={formik.handleChange}
+              value={formik.values.Password}
+              style={{ paddingLeft: "35px" }} // Add padding to avoid overlap with the icon
+            />
+            <i
+              className="fas fa-lock"
+              style={{
+                position: "absolute",
+                left: "11px",
+                top: "40%",
+                transform: "translateY(-50%)",
+                pointerEvents: "none", // Prevent clicking the icon
+                color: "#aaa",
+                fontSize: "18px", // Adjust the font size to control the icon size
+              }}
+            />
+          </div>
           {formik.touched.Password && formik.errors.Password ? (
             <div className="error-message"> {formik.errors.Password}</div>
           ) : null}
           {isLoading ? (
-            <Button 
-            style={{backgroundColor: "#007bff",color:"white"}}
-            disabled>Loading...</Button>
+            <Button
+              style={{ backgroundColor: "#007bff", color: "white" }}
+              disabled
+            >
+              Loading...
+            </Button>
           ) : (
             <button type="submit">Se connecter</button>
           )}
         </form>
-        <a href="#">Mot de passe oublié ?</a>
-        <a href="#">Pas encore membre? S`inscrire</a>
+
+        <Button 
+        style={{ backgroundColor: "#FFFFFF", color: "black", marginTop: "10px"}}
+        onClick={SignUpNavigation}
+        >
+          Pas encore membre? S`inscrire
+        </Button>
+        <a href="/ResetPassword">Mot de passe oublié ?</a>
+    
       </div>
     </div>
   );
@@ -150,17 +191,15 @@ export default function Login (){
 
 export const fetchStockNotif = async (setMessages, setNotificationCount) => {
   try {
-  
     const stockRes = await axiosInstance.get("/api/v1/getstocknotif");
     const notificationMessage = stockRes.data;
-    
+
     if (notificationMessage !== "No alerts of stock found.") {
-      const messages = notificationMessage.split('\n');
-      console.log("This Fetch Stock Messages",messages)
+      const messages = notificationMessage.split("\n");
+      console.log("This Fetch Stock Messages", messages);
 
       setMessages(messages); // Update messages state
       setNotificationCount(messages.length); // Update notification count with the number of messages
-  
     }
   } catch (error) {
     console.error("Error fetching notification data:", error);
