@@ -6,7 +6,7 @@ const Breadcrumbs = () => {
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   // Define a list of pathnames that should not be displayed
-  const excludedPaths = ["produits", "tresorerie", "Dashboard",];
+  const excludedPaths = ["produits", "tresorerie", "Dashboard","FactureView"];
 
   return (
     <MuiBreadcrumbs

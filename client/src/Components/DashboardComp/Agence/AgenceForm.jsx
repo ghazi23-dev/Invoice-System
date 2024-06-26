@@ -78,7 +78,7 @@ const [SuperAdminData, setSuperAdminData] = useState([]);
             );
             console.log("Response from server Admin ID:", response.data);
             setSuperAdminData(response.data);
-            console.log("Super Admin Data ID:", SuperAdminData[0].User_ID);
+          
           } catch (error) {
             console.error("Error fetching data from server:", error);
           }

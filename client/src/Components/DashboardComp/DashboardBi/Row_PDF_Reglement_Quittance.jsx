@@ -10,27 +10,43 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import Logo from "../../../assets/logaris.png";
+import LogoKV from "../../../assets/KVLogo.png";
 
 import { ToWords } from "to-words";
 import QRCode from "qrcode";
 import NunitoRegular from "../../../assets/Fonts/Nunito-Regular.ttf";
 import NunitoExtraBold from "../../../assets/Fonts/Nunito-ExtraBold.ttf";
+
+
+
+
+
 const Row_PDF_Reglement_Quittance = ({ record }) => {
-  const [profilSociete, setProfilSociete] = useState(null);
-  const [localData, setLocalData] = useState("");
-  const uniqueTaxes = [...new Set(record.Items.map((item) => item.Tax))];
-  const uniqueDiscounts =  [...new Set(record.Items.map((item) => item.Discount))];
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+
+
+
 
   
 
-  Font.register({
-    family: "Nunito",
-    fonts: [
-      { src: NunitoRegular, fontWeight: "normal" },
-      { src: NunitoExtraBold, fontWeight: "bold" },
-    ],
-  });
+  
+
+
+
+  const [localData, setLocalData] = useState("");
+  const uniqueTaxes = [...new Set(record.Items.map((item) => item.Tax))];
+
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+
+  useEffect(() => {
+    Font.register({
+      family: "Nunito",
+      fonts: [
+        { src: NunitoRegular, fontWeight: "normal" },
+        { src: NunitoExtraBold, fontWeight: "bold" },
+      ],
+    });
+  }, []);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR");
@@ -39,22 +55,26 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
     if (userDetails) {
-      const {fullname, } = userDetails;
+      const { fullname } = userDetails;
 
-      
       setLocalData(fullname);
     }
   }, []);
 
   QRCode.toDataURL(
-    `STE GHAZI VOYAGES , Détail du Facture:
-  Facture N°: ${record.InvoiceID}, 
+    `STE KAYAN VOYAGES , Détail du Facture:
+  Client: ${record.client.ClientName},
+  Facture N°: ${record.invoiceNumber}, 
   Date: ${formatDate(record.InvoiceDate)},
-  Total TTC: ${record.TotalAmount},
-  Total HT: ${record.TotalHT},
-  Total TVA: ${record.Tva},
+  Total TTC: ${Number(record.TotalAmount).toFixed(3)},
+  Total HT: ${Number(record.TotalHT).toFixed(3)},
+  Total TVA: ${Number(record.Tva).toFixed(3)},
   Timbre Fiscal: ${Number(record.Timbre_Fiscal).toFixed(3)},
   Agent de Saisie: ${localData},
+  Date de Saisie: ${formatDate(record.CreatedAt)},
+  Systeme de Facturation: GSoft Innovations: Contacter Nous: https://www.linkedin.com/in/ghazi-smach/ 
+  
+
 
  `
   )
@@ -98,141 +118,89 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
     ITEMS_PER_PAGE
   );
 
-  
   const toWords = new ToWords({
-    localeCode: 'fr-FR',
+    localeCode: "fr-FR",
     converterOptions: {
-        currency: true,
-        ignoreDecimal: true,
-        ignoreZeroCurrency: false,
-        doNotAddOnly: false,
-        currencyOptions: {
-            // can be used to override defaults for the selected locale
-            name: 'Dinar',
-            plural: 'Dinars',
-            symbol: 'TND',
-            fractionalUnit: {
-                name: 'Millime',
-                plural: 'Millimes',
-                symbol: '',
-            },
+      currency: true,
+      ignoreDecimal: true,
+      ignoreZeroCurrency: false,
+      doNotAddOnly: false,
+      currencyOptions: {
+        // can be used to override defaults for the selected locale
+        name: "Dinar",
+        plural: "Dinars",
+        symbol: "TND",
+        fractionalUnit: {
+          name: "Millime",
+          plural: "Millimes",
+          symbol: "",
         },
+      },
     },
-});
+  });
+
+  const renderTableRows = (items) => {
+
+
+    return items.map((item, index) => (
+      <View style={styles.tableRow} key={index}>
+        <Text style={styles.tableCell}>{record.referenceNumber}</Text>
+        <Text style={[styles.tableCell, styles.widerCell]}>{item.Description}</Text>
+        <Text style={styles.tableCell}>{item.Quantity}</Text>
+        <Text style={styles.tableCell}>{Number(item.Rate).toFixed(3)}</Text>
+        <Text style={styles.tableCell}>{Number(item.Amount).toFixed(3)}</Text>
+      </View>
+    ));
+  };
 
   return (
+    
     <Document title={`Facture N°: ${record.invoiceNumber}`}>
       {itemsPages.map((items, pageIndex) => (
-        <Page
-          key={pageIndex}
-          size="A4"
-          style={styles.page}
-          orientation="portrait"
-        >
+        <Page key={pageIndex} size="A4" style={styles.page} orientation="portrait">
           {pageIndex === 0 && (
             <>
               <View style={styles.header}>
-                <Image src={Logo} style={styles.logo} />
-                {qrCodeDataUrl && (
-                  <Image src={qrCodeDataUrl} style={styles.qrCode} />
-                )}
-
-                {/* <View style={styles.titleContainer}>
-                  <Text style={styles.companyName}>Tunisiabeds</Text>
-                  <Text style={styles.invoiceTitle}>
-                    Facture N° {record.InvoiceID}
-                  </Text>
-                </View> */}
+                <Image src={LogoKV} style={styles.logo} />
+                {qrCodeDataUrl && <Image src={qrCodeDataUrl} style={styles.qrCode} />}
               </View>
-
-              <Text style={styles.invoiceTitleUI}>
-                Facture N°: {record.invoiceNumber}
-              </Text>
-
+              <Text style={styles.invoiceTitleUI}>Facture N°: {record.invoiceNumber}</Text>
               <View style={styles.details}>
                 <View style={styles.detailsColumn}>
-                
-                  <Text style={styles.value}>STE GHAZI VOYAGES</Text>
-                  <Text style={styles.value}>Skanes Monastir </Text>
-                  <Text style={styles.value}>73500987 / 98680541</Text>
-                  <Text style={styles.value}>MF179874/000/M/R</Text>
+                  <Text style={styles.value}>KAYAN VOYAGES</Text>
+                  <Text style={styles.value}>AV de La République Monastir 5060</Text>
+                  <Text style={styles.value}>(+216)73501021</Text>
+                  <Text style={styles.value}>MF: 1717704 R/A/M/000</Text>
                 </View>
                 <View style={styles.detailsColumn}>
-                  {/* <Text style={styles.label}>Name</Text> */}
                   <Text style={styles.value}>{record.client.ClientName}</Text>
-                  {/* <Text style={styles.label}>Adresse:</Text> */}
                   <Text style={styles.value}>{record.client.ClientAddress}</Text>
-                  {/* <Text style={styles.label}>MF:</Text> */}
-                  {/* <Text style={styles.value}>{record.client.ClientEmail}</Text> */}
-
-
-                  {/* <Text style={styles.label}>Tel:</Text> */}
-                  <Text style={styles.value}>{record.client.ClientLocation}</Text>
-                  {/* <Text style={styles.label}>MF:</Text> */}
+                  <Text style={styles.value}>{record.client.ClientPhone}</Text>
                   <Text style={styles.value}>{record.client.Matricule_fiscale}</Text>
-
+                  
+                
+           
                 </View>
               </View>
-              
-          <Text style={styles.labelDateFacture}>
-            Monastir le {formatDate(record.InvoiceDate)}
-          </Text>
+              <Text style={styles.labelDateFacture}>Monastir le {formatDate(record.InvoiceDate)}</Text>
             </>
           )}
 
-
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.tableCell, styles.tableCellHeader]}>
-                Référence
-              </Text>
-              <Text
-                style={[
-                  styles.tableCell,
-                  styles.tableCellHeader,
-                  styles.widerCell,
-                ]}
-              >
-                Désignation
-              </Text>
-              <Text style={[styles.tableCell, styles.tableCellHeader]}>
-                Quantité
-              </Text>
-              <Text style={[styles.tableCell, styles.tableCellHeader]}>
-                P.U
-              </Text>
-              <Text style={[styles.tableCell, styles.tableCellHeader]}>
-                Montant Total
-              </Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>Référence</Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader, styles.widerCell]}>Désignation</Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>Quantité</Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>P.U</Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>Montant Total</Text>
             </View>
-            {items.map((item, index) => (
-              <View style={styles.tableRow} key={index}>
-                <Text style={styles.tableCell}>{record.referenceNumber}</Text>
-                <Text style={[styles.tableCell, styles.widerCell]}>
-                  {item.Description}
-                </Text>
-                <Text style={[styles.tableCell]}>{item.Quantity}</Text>
-                <Text style={styles.tableCell}>
-                  {Number(item.Rate).toFixed(3)}
-                </Text>
-                <Text style={styles.tableCell}>
-                  {Number(item.Amount).toFixed(3)}
-                </Text>
-                
-
-                
-              </View>
-              
-              
-            ))}
+            {renderTableRows(items)}
           </View>
 
           {pageIndex === itemsPages.length - 1 && (
             <>
               <View style={styles.calculations}>
-                <Text style={styles.calculationsHeader}>
-                  Base de calcul de la TVA
-                </Text>
+                <Text style={styles.calculationsHeader}>Base de calcul de la TVA</Text>
                 <View style={styles.calculationTable}>
                   <View style={styles.calculationRow}>
                     <Text style={styles.calculationLabel}>Base TVA</Text>
@@ -241,30 +209,30 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                     <Text style={styles.calculationLabel}>Montant TVA</Text>
                   </View>
                   <View style={styles.calculationRow}>
+                    <Text style={styles.calculationValue}>{Number(record.TotalHT).toFixed(3)}</Text>
                     <Text style={styles.calculationValue}>
-                      {Number(record.TotalHT).toFixed(3)}
+                      {[
+                        ...new Set(
+                          record.Items.map((item) => {
+                            if (item.DiscountType === "Percentage(%)") {
+                              return `${item.Discount}%`;
+                            } else if (item.DiscountType === "Flat") {
+                              return `${Number(item.Discount).toFixed(3)} DT`;
+                            }
+                            return null;
+                          })
+                        ),
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
                     </Text>
-                    <Text style={styles.calculationValue}>
-                    {[...new Set(record.Items.map((item) => {
-            if (item.DiscountType === "Percentage(%)") {
-              return `${item.Discount}%`;
-            } else if (item.DiscountType === "Flat") {
-              return `${Number(item.Discount).toFixed(3)} DT`;
-            }
-            return null;
-          }))].filter(Boolean).join(", ")}
-        </Text>
-        <Text style={styles.calculationValue}>
-          {uniqueTaxes.join(", ")}%
-                    </Text>
+                    <Text style={styles.calculationValue}>{uniqueTaxes.join(", ")}%</Text>
                     <Text style={styles.calculationValue}>{Number(record.Tva).toFixed(3)}</Text>
                   </View>
                 </View>
               </View>
-              
 
               <View style={styles.summaryContainer} wrap={false}>
-              
                 <View style={styles.summaryBox}>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total HT:</Text>
@@ -272,9 +240,7 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Remise:</Text>
-                    <Text style={styles.summaryValue}>
-                      {Number(record.Discount).toFixed(3)}
-                    </Text>
+                    <Text style={styles.summaryValue}>{Number(record.Discount).toFixed(3)}</Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total TVA:</Text>
@@ -282,40 +248,35 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Timbre Fiscal:</Text>
-                    <Text style={styles.summaryValue}>
-                      {Number(record.Timbre_Fiscal).toFixed(3)}
-                    </Text>
+                    <Text style={styles.summaryValue}>{Number(record.Timbre_Fiscal).toFixed(3)}</Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total TTC:</Text>
-                    <Text style={styles.summaryValue}>
-                      {Number(record.TotalAmount).toFixed(3)}
-                    </Text>
+                    <Text style={styles.summaryValue}>{Number(record.TotalAmount).toFixed(3)}</Text>
                   </View>
                 </View>
               </View>
               <Text style={styles.footerTextNumber}>
                 Arrêtée la présente facture à la somme de:{" "}
-                {toWords.convert(amount , { currency: true }) + " et " + (amount % 1).toFixed(3).substring(2)} millimes
-
+                {toWords.convert(amount, { currency: true }) +
+                  " et " +
+                  (amount % 1).toFixed(3).substring(2)}{" "}
+                millimes
               </Text>
             </>
           )}
 
-          <View style={styles.footer}fixed>
-            <Text style={styles.footerText}fixed>
-              Banque: AMEN BANK | RIB: TN591450369802014701 | Code SWIFT:
-              BCTNTNTT | Email: Email@mail.tn | Tel: 71 000 000
+          <View style={styles.footer} fixed>
+            <Text style={styles.footerText}>
+              Banque: UIB | RIB: TN5912502000003302816642 | Code SWIFT: UIBKTNTT | Email: Contact@Kayanvoyages.tn | Tel: 73501021
             </Text>
-            <Text style={styles.footerText} fixed>
-              Merci de bien vouloir effectuer le paiement avant le [{formatDate(record.dueDate)}].
+            <Text style={styles.footerText}>
+              Merci de bien vouloir effectuer le paiement avant le [ {formatDate(record.dueDate)} ].
             </Text>
           </View>
           <Text
             style={styles.pageNumber}
-            render={({ pageNumber, totalPages }) =>
-              `${pageNumber} / ${totalPages}`
-            }
+            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
             fixed
           />
         </Page>
@@ -338,8 +299,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 85,
-    height: 85,
+    width: 95,
+    height: 105,
   },
   titleContainer: {
     flexGrow: 1,
@@ -384,9 +345,9 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 11,
-   fontFamily: "Nunito",
-   fontWeight: "bold",
-   marginBottom: 10,
+    fontFamily: "Nunito",
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   table: {
     display: "table",
@@ -419,7 +380,6 @@ const styles = StyleSheet.create({
   tableCellHeader: {
     fontWeight: "bold",
     fontFamily: "Nunito",
-
   },
   calculations: {
     marginBottom: 20,
@@ -436,8 +396,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#bfbfbf",
     textAlign: "center",
-    
-    
   },
   calculationRow: {
     flexDirection: "row",
@@ -451,7 +409,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     fontFamily: "Nunito",
-
   },
   calculationValue: {
     flex: 1,
@@ -462,7 +419,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "Nunito",
     fontWeight: "normal",
-
   },
   summaryContainer: {
     display: "flex",
@@ -488,9 +444,8 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     fontSize: 9,
-        fontFamily: "Nunito",
-        fontWeight: "bold",
-
+    fontFamily: "Nunito",
+    fontWeight: "bold",
   },
   footer: {
     marginTop: 20,
@@ -516,7 +471,6 @@ const styles = StyleSheet.create({
     marginBottom: 52,
     color: "black",
     fontFamily: "Nunito",
-
   },
 
   pageNumber: {
@@ -529,8 +483,8 @@ const styles = StyleSheet.create({
     color: "black",
   },
   qrCode: {
-    width: 80,
-    height: 80,
+    width: 93,
+    height: 93,
     marginTop: 10,
     position: "absolute",
     top: 0,
@@ -542,7 +496,7 @@ const styles = StyleSheet.create({
     marginTop: 13,
     position: "absolute",
 
-    left:80,
+    left: 80,
   },
   labelDateFacture: {
     fontSize: 10,

@@ -56,7 +56,7 @@ const PrivateRoute = ({ element, roles = [] }) => {
 
   if (!authenticated) {
   
-     return <Navigate to="/login"
+     return <Navigate to="/"
      
      
      />;

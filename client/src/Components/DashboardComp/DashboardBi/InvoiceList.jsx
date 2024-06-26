@@ -8,7 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import PDFRenderComponent from "./Row_PDF_Reglement_Quittance";
-import { PDFDownloadLink, } from "@react-pdf/renderer";
+import { PDFDownloadLink,  } from "@react-pdf/renderer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faDownload,faEye,} from "@fortawesome/free-solid-svg-icons";
 import InvoiceViewForm from "./InvoiceViewComponent";
@@ -37,17 +37,24 @@ const Invoice_List = () => {
     try {
       const response = await axiosInstance.get("/api/v1/getInvoices");
       console.log("Response from server:", response.data);
-
-      // Ensure response data is an array
+  
       const invoices = response.data.success ? response.data.invoices : response.data;
-      setData(invoices);
-
+      // Format the dueDate properly
+      const formattedInvoices = invoices.map(invoice => ({
+        ...invoice,
+        dueDate: new Date(invoice.dueDate).toISOString().split('T')[0],
+        InvoiceDate: new Date(invoice.InvoiceDate).toISOString().split('T')[0],
+       
+      }));
+      setData(formattedInvoices);
+  
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data from server:", error);
       setLoading(false);
     }
   };
+  
   const handleDownloadClick = async (invoiceID) => {
     setDownloadInvoiceID(invoiceID);
 
@@ -55,6 +62,7 @@ const Invoice_List = () => {
     
   };
  
+
   // const handleRowClick = (record) => {
   //   setSelectedRow(record.data.InvoiceID); // Updated to access the correct data
   // };
@@ -75,18 +83,6 @@ const Invoice_List = () => {
 
 
 
-    const viewInvoice = async (InvoiceID) => {
-    try {
-      const response = await axiosInstance.get(`/api/v1/getInvoiceByID/${InvoiceID}`);
-      console.log("Invoice Getted By ID:", response.data);
-      const invoice = response.data.success ? response.data.invoice : response.data;
-      setInvoiceData(invoice);
-     
-      console.log("Invoice Data:", invoice);
-    } catch (error) {
-      console.error("Error fetching invoice data:", error);
-    }
-  };
 
   const viewInvoice1 = async (InvoiceID) => {
     try {
@@ -95,11 +91,14 @@ const Invoice_List = () => {
       const invoice = response.data.success ? response.data.invoice : response.data;
       setInvoiceData(invoice);
       console.log("Invoice Data:", invoice);
-      navigate(`/Dashboard/FactureView/${InvoiceID}`); // Navigate to the new route
+      navigate(`/Dashboard/ListeFacture/${InvoiceID}`); // Navigate to the new route
     } catch (error) {
       console.error("Error fetching invoice data:", error);
     }
   };
+
+
+ 
 
   const columns = [
     // { 
@@ -116,21 +115,22 @@ const Invoice_List = () => {
       cellRenderer: (params) => (
         <Tag color="blue-inverse">{params.value}</Tag>
       ),
-      maxWidth: 160,
+     
     },
     { 
       headerName: "Nom Client", 
-      field: "customerName" 
+      field: "customerName" ,
+      minWidth: 190,
+
+
     },
     { 
       headerName: "Date Facturation", 
       field: "InvoiceDate",
+      filter: 'agDateColumnFilter',
       cellRenderer: (params) => (
-        <Tag color="green-inverse">{new Date(params.value).toLocaleDateString('fr-FR', {
-          year: 'numeric',
-          month: 'numeric',
-          day: 'numeric',
-        }).replace(/\//g, '-')}
+        <Tag color="green-inverse">
+         {(params.value).split('T')[0]}
         </Tag>
       ),
       width: 190,
@@ -139,17 +139,14 @@ const Invoice_List = () => {
     {
       headerName: "Date Echéance", 
       field: "dueDate",
-      maxWidth: 180,
+      minWidth: 180,
+      filter: 'agDateColumnFilter',
       cellRenderer: (params) => (
-        <Tag color="red-inverse">
-          {new Date(params.value).toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-          }).replace(/\//g, '-')}
-        </Tag>
-
+        <Tag color="blue-inverse">
+        {new Date(params.value).toISOString().split('T')[0]}
+      </Tag>
       ),
+      
 
    
     },
@@ -192,7 +189,7 @@ const Invoice_List = () => {
     { 
       headerName: "Montant Total", 
       field: "TotalAmount", 
-      maxWidth: 180,
+      minWidth: 180,
       cellRenderer: (params) => (
         
         
@@ -204,7 +201,7 @@ const Invoice_List = () => {
     { 
       headerName: "Created At", 
       field: "CreatedAt",
-      maxWidth: 190,
+      minWidth: 160,
       cellRenderer: (params) => (
         <Tag color="purple-inverse">{new Date(params.value).toLocaleString()}</Tag>
       ),
@@ -212,14 +209,15 @@ const Invoice_List = () => {
     { 
       headerName: "Updated At", 
       field: "UpdatedAt",
+      minWidth: 160,
       cellRenderer: (params) => (
-        <Tag color="yellow-inverse">{new Date(params.value).toLocaleString()}</Tag>
+        <Tag color="#008997">{new Date(params.value).toLocaleString()}</Tag>
       ),
     },
     {
       headerName: "Action",
       field: "actions",
-      maxWidth: 130,
+    
       cellRenderer: (params) => (
         <Space size="middle">
         {downloadInvoiceID === params.data.InvoiceID ? (
@@ -277,6 +275,8 @@ const Invoice_List = () => {
         >
           Insert
         </Button>
+
+     
         <AgGridReact
        // Updated to use onRowClicked
           rowData={data}
@@ -285,13 +285,9 @@ const Invoice_List = () => {
           pagination={true}
         />
 
-{/* <div style={{ width: "100%", marginLeft: "20px" }}>
-          {selectedRow && (
-            <PDFViewer style={{ width: "100%", height: 900 }}>
-              <PDFRenderComponent record={data.find(item => item.InvoiceID === selectedRow)} />
-            </PDFViewer>
-          )}
-        </div> */}
+
+
+
                {invoiceData && (
           <div>
             <InvoiceViewForm invoiceData={invoiceData} />

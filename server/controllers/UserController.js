@@ -66,7 +66,7 @@ class UserController {
         const token = jwt.sign(
           { User_ID, UserName, fullname, UserEmail, Role, Agency_ID },
           "secret",
-          { expiresIn: "1h" }
+          { expiresIn: "3h" }
         );
         res.cookie("token", token, { httpOnly: true });
         res.json({ success: true, user: login.user, token: token });

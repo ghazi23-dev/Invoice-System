@@ -91,9 +91,15 @@ const Dashboard = () => {
   
 
   const [columnDefs] = useState([
-    { headerName: 'ID', field: 'AchatID', filter: 'agNumberColumnFilter', editable: false},
+    { headerName: 'N° Ligne', field: 'AchatID', filter: 'agNumberColumnFilter', editable: false,
+    cellRenderer: (params) => (
+      <Tag color="blue-inverse">{params.value}</Tag>
+    ),
+    maxWidth: 130,
+    },
     { headerName: 'DATE', field: 'DATE', filter: 'agDateColumnFilter', editable: true },
     { headerName: 'AGENT', field: 'AGENT', filter: 'agTextColumnFilter', editable: true,
+    maxWidth: 135,
      },
     { headerName: 'DESIGNATION', field: 'DESIGNATION', filter: 'agTextColumnFilter', editable: true },
     { headerName: 'PLATEFORME', field: 'PLATEFORME', filter: 'agTextColumnFilter', editable: true ,},
@@ -136,11 +142,30 @@ const Dashboard = () => {
       //   'canceled-cell': params => params.value === 'Canceled',
       // }
     },
-    { headerName: 'N° RECU', field: 'NUMERO_RECU', filter: 'agNumberColumnFilter', editable: true },
-    { headerName: 'PRIX VENTE', field: 'PRIX_VENTE', filter: 'agNumberColumnFilter', editable: true },
-    { headerName: 'PRIX ACHAT', field: 'PRIX_ACHAT', filter: 'agNumberColumnFilter', editable: true },
-    { headerName: 'AVANCE', field: 'AVANCE', filter: 'agNumberColumnFilter', editable: true },
-    { headerName: 'RESTE', field: 'RESTE', filter: 'agNumberColumnFilter', editable: true },
+    { headerName: 'N° RECU', field: 'NUMERO_RECU', filter: 'agNumberColumnFilter', editable: true,
+    maxWidth: 135,
+
+     },
+    { headerName: 'PRIX VENTE', field: 'PRIX_VENTE', filter: 'agNumberColumnFilter', editable: true,
+    valueFormatter: (params) => parseFloat(params.value).toFixed(3),
+     },
+    { headerName: 'PRIX ACHAT', field: 'PRIX_ACHAT', filter: 'agNumberColumnFilter', editable: true,
+    valueFormatter: (params) => parseFloat(params.value).toFixed(3),
+     },
+    { 
+      headerName: 'AVANCE', 
+      field: 'AVANCE', 
+      filter: 'agNumberColumnFilter', 
+      editable: true,
+      cellStyle: {backgroundColor: '#52C41A'},
+      valueFormatter: (params) => parseFloat(params.value).toFixed(3),
+  },
+  
+    { headerName: 'RESTE', field: 'RESTE', filter: 'agNumberColumnFilter', editable: true ,
+    cellStyle: {backgroundColor: 'red',},
+    valueFormatter: (params) => parseFloat(params.value).toFixed(3),
+
+    },
     { headerName: 'OBSERVATION', field: 'OBSERVATION', filter: 'agTextColumnFilter', editable: true },
   ]);
 
@@ -152,6 +177,8 @@ const Dashboard = () => {
     resizable: true,
     floatingFilter: true,
     editable: true,
+
+
   
 
   };
@@ -193,11 +220,11 @@ const handleupdate = async () => {
         icon={<FontAwesomeIcon icon={faPlusCircle} size="lg" />}
       style={{position:"absolute", right:"0" ,marginRight: '9%', marginBottom: '10px', top:"110px",}}
       variant="contained" type='primary'  onClick={addNewRow}>
-        Add New Row
+      
       </Button>
       <Button 
       icon={<FontAwesomeIcon icon={faSave} size="lg" />}
-      style={{ position:"absolute", right:"0" , marginBottom: '10px', top:"110px",}}
+      style={{ position:"absolute", right:"10px" , marginBottom: '10px', top:"110px",}}
       onClick={saveChanges} >
         Save Changes
       </Button>
@@ -209,6 +236,7 @@ const handleupdate = async () => {
   onCellValueChanged={handleCellValueChanged}
   stopEditingWhenCellsLoseFocus={true}
   getRowClass={params => params.data.isNew ? 'new-row' : ''}
+  
 />
     </div>
   );

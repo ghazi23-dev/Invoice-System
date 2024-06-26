@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuildingColumns,faFileInvoiceDollar ,faCashRegister, faBuilding,faListUl,faMoneyBill,faUsers,faSackDollar,faCubesStacked,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar } 
+import { faFileInvoice,faFileInvoiceDollar ,faListCheck, faBuilding,faUsers,faSackDollar,faCubesStacked,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar, faList12 } 
   from '@fortawesome/free-solid-svg-icons';
 import { HomeOutlined, UsergroupDeleteOutlined,  SettingOutlined ,} from '@ant-design/icons';
 import './Sidebar.css';
@@ -66,26 +66,29 @@ useEffect(() => {
             ) : null}
 
 
+<Menu.SubMenu key='Facturation' title="Facturation" icon={<FontAwesomeIcon icon={faFileInvoice} />} >
+        <Menu.Item key="Facture" icon={<FontAwesomeIcon icon={faCirclePlus} />}>
+          <Link to="/Dashboard/DashboardBi">Ajouter Facture</Link>
+        </Menu.Item>
+        <Menu.Item key="Liste Facture" icon={<FontAwesomeIcon icon={faList12} />}>
+          <Link to="/Dashboard/ListeFacture">Liste Facture</Link>
+        </Menu.Item>
+     
+      </Menu.SubMenu> 
 
-{(isAdmin) ? (
-      <Menu.Item key="Facturation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
-        <Link to="/Dashboard/DashboardBi">Facturation</Link>
-      </Menu.Item>
-            ) : null}
 
             {(isAdmin) ? (
       <Menu.Item key="FacturationID"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
-        <Link to="/Dashboard/FactureView/:InvoiceID">View INV</Link>
+        <Link to="/Dashboard/ListeFacture/:InvoiceID">View INV</Link>
       </Menu.Item>
             ) : null}
 
             
+            
 
-{(isAdmin) ? (
-      <Menu.Item key="Facturation_List"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
-        <Link to="/Dashboard/ListeFacture">Liste Facture</Link>
-      </Menu.Item>
-            ) : null}
+            
+
+
 
 {(isAdmin) ? (
       <Menu.Item key="Produit_Reservation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
@@ -98,10 +101,14 @@ useEffect(() => {
           <Link to="/Dashboard/Agent">Agent</Link>
         </Menu.Item>
       ) : null}
+
+
+
+
    
-<Menu.SubMenu key='trésorerie' title="Trésorerie" icon={<FontAwesomeIcon icon={faSackDollar} />} >
+{/* <Menu.SubMenu key='Facturation' title="Facturation" icon={<FontAwesomeIcon icon={faSackDollar} />} >
 {(isAdmin) ? (
-  <Menu.SubMenu key="caisse" title="caisse" icon={<FontAwesomeIcon icon={faCashRegister} />}>
+  <Menu.SubMenu key="Facture" title="CréationFacture" icon={<FontAwesomeIcon icon={faCashRegister} />}>
     <Menu.Item key="caisse" icon={<FontAwesomeIcon icon={faMoneyBill} />}>
       <Link to="/Dashboard/tresorerie/caisse/">Caisse</Link>
     </Menu.Item>
@@ -110,6 +117,8 @@ useEffect(() => {
     </Menu.Item>
   </Menu.SubMenu>
  ) : null}
+
+
 
  {(isAdmin) ? (
   <Menu.Item key="banque" icon={<FontAwesomeIcon icon={faBuildingColumns} />}>
@@ -132,25 +141,13 @@ useEffect(() => {
   </Menu.SubMenu>
 
 
-  
-</Menu.SubMenu>
+  </Menu.SubMenu> */}
 
 
-      <Menu.SubMenu key='produits' title="Produits" icon={<FontAwesomeIcon icon={faCubesStacked} />} >
-        <Menu.Item key="produits" icon={<FontAwesomeIcon icon={faCirclePlus} />}>
-          <Link to="/Dashboard/produits/ajouter-produits">Ajouter Produit</Link>
-        </Menu.Item>
-        <Menu.Item key="stock" icon={<FontAwesomeIcon icon={faWarehouse} />}>
-          <Link to="/Dashboard/produits/stock">Stock</Link>
-        </Menu.Item>
-        {(isAdmin) ? (
-        <Menu.Item key="Historique Stock" icon={<FontAwesomeIcon icon={faHistory} />}>
-          <Link to="/Dashboard/produits/historique-stock">Historique stock</Link>
-        </Menu.Item>
-          ) : null}
-      </Menu.SubMenu>
+
      
-      <Menu.Item key="fournisseur" icon={<FontAwesomeIcon icon={faUsers} />}>
+     
+        <Menu.Item key="fournisseur" icon={<FontAwesomeIcon icon={faUsers} />}>
         <Link to="/Dashboard/Fournisseur">Fournisseur</Link>
       </Menu.Item>
      

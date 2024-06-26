@@ -5,6 +5,9 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../Auth/AxiosInstance";
+import LogoGS from "../../assets/GSoft.png";
+import {Button} from 'antd';
+
 export default function Login (){
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -67,49 +70,83 @@ export default function Login (){
     
 
   return (
-    <div className="login">
-      <div className="card">
-        <div className="left">
-          <h1>G - Bridge</h1>
-          <p>
-          G-Bridge est bien plus qu’un simple logiciel de facturation. C’est votre partenaire de confiance pour gérer efficacement vos transactions financières. Notre solution offre une expérience fluide et intuitive, conçue pour répondre à vos besoins spécifiques
-          </p>
+    <div className="login-container">
+      <div className="left-section">
+     
+       <div className="image-container">
+          <img src={LogoGS} alt="Logo" />
         </div>
-        <div className="right">
-          <h1>Login</h1>
-          <form onSubmit={formik.handleSubmit}>
-            <input  
-              type="email"
-              placeholder="Email"
-              name="UserEmail"
-              onChange={formik.handleChange}
-              value={formik.values.UserEmail}
-            />
-            {formik.touched.UserEmail && formik.errors.UserEmail ? (
-              <div className="error-message"> {formik.errors.UserEmail}</div>
-            ) : null}
-            <input
-              type="password"
-              placeholder="Password"
-              name="Password"
-              onChange={formik.handleChange}
-              value={formik.values.Password}
-            />
-            {formik.touched.Password && formik.errors.Password ? (
-              <div className="error-message"> {formik.errors.Password}</div>
-            ) : null}
-            {isLoading ? (
-              <button disabled>Loading...</button>
-            ) : (
-              <button type="submit">Login</button>
-            )}
-          </form>
+        <p>GSoft Innovations vous offre une solution complète pour la gestion de vos facturations</p> 
+          <p>Simplifiez votre processus de facturation avec notre application innovante.</p>     
+        <div className="stats">
+        
+          <div>
+          <span>574K+</span>
+          <span>Factures Traitée</span>
+          </div>
+          <div>
+          <span>335+</span>
+          <span>Clients Satisfaits</span>
+          </div>
+          <div>
+          <span>239M</span>
+          <span>Transactions</span>
+          </div>
         </div>
+        {/* <button className="register-button">Inscription Gratuite</button> */}
+        <div className="contact-info">
+          {/* <div>
+            <span>HELP DESK 24H / 24 - 7J / 7</span>
+            <span>(+216) 00000 000000 </span>
+          </div>
+          <div>
+            <span>EMERGENCY 24H / 24 - 7J / 7</span>
+            <span>(+216) 0000000 00000 mail@mail.com</span>
+          </div> */}
+        </div>
+      </div>
+      <div className="right-section">
+        <h1>Se connecter</h1>
+       
+        <form onSubmit={formik.handleSubmit}>
+          <input 
+            type="email"
+            placeholder="Nom d'utilisateur"
+            name="UserEmail"
+            onChange={formik.handleChange}
+            value={formik.values.UserEmail}
+            icon="user"
+            
+          />
+          {formik.touched.UserEmail && formik.errors.UserEmail ? (
+            <div className="error-message"> {formik.errors.UserEmail}</div>
+          ) : null}
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            name="Password"
+            onChange={formik.handleChange}
+            value={formik.values.Password}
+            icon="lock"
+            
+          />
+          {formik.touched.Password && formik.errors.Password ? (
+            <div className="error-message"> {formik.errors.Password}</div>
+          ) : null}
+          {isLoading ? (
+            <Button 
+            style={{backgroundColor: "#007bff",color:"white"}}
+            disabled>Loading...</Button>
+          ) : (
+            <button type="submit">Se connecter</button>
+          )}
+        </form>
+        <a href="#">Mot de passe oublié ?</a>
+        <a href="#">Pas encore membre? S`inscrire</a>
       </div>
     </div>
   );
 }
-
 
 export const fetchStockNotif = async (setMessages, setNotificationCount) => {
   try {

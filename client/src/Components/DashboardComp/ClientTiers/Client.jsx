@@ -37,10 +37,10 @@ const Client = () => {
     }
   };
 
-  const handleEdit = async (User_ID) => {
+  const handleEdit = async (Client_ID) => {
     try {
       const response = await axiosInstance.get(
-        `/api/v1/getuserbyid/${User_ID}`
+        `/api/V1/getClientByID/${Client_ID}`
       );
       const user = response.data;
       setUserData(user);
@@ -85,27 +85,40 @@ const Client = () => {
   };
 
   const columns = [
-    { headerName: "Code Client", field: "Client_ID" },
+    { headerName: "Code Client", field: "Client_ID" ,
+    cellRenderer: (params) => (
+      <Tag color="blue-inverse">{params.value}</Tag>
+    ),
+    minWidth: 80,
+    },
     { headerName: "Nom Client", field: "ClientName",
     cellRenderer: (params) => (
-      <Tag color="orange-inverse">{params.value}</Tag>
+      <Tag color="purple-inverse">{params.value}</Tag>
     ),
      },
     { headerName: "Numéro Tel", field: "ClientPhone" },
     { headerName: "Email", field: "ClientEmail" },
     { headerName: "Adresse", field: "ClientAddress" },
-    { headerName: "Régions", field: "ClientLocation" },
+    { headerName: "Régions", field: "ClientLocation" ,
+      maxWidth: 140,
+    },
     { headerName: "Matricule Fiscale", field: "Matricule_fiscale",
 cellRenderer: (params) => (
           <Tag color="blue-inverse">{params.value}</Tag>
                 ),
-
+                maxWidth: 200,
 
 
     },
     
    
-    { headerName: "Date de Création", field: "created_at" },
+    { headerName: "Date de Création", field: "created_at" 
+    ,cellRenderer: (params) => (
+      <Tag color="green-inverse">{new Date(params.value).toLocaleString()}</Tag>
+    ),
+    minWidth: 200,
+
+    },
     {
       headerName: "Action",
       field: "actions", // Make sure this matches the field in your data source
@@ -114,7 +127,7 @@ cellRenderer: (params) => (
           <Button
             style={{ color: "green", fontWeight: "bold" }}
             icon={<FontAwesomeIcon icon={faEdit} size="lg" />}
-            onClick={() => handleEdit(params.data.User_ID)}
+            onClick={() => handleEdit(params.data.Client_ID)}
           ></Button>
           <Button
             style={{ color: "red", fontWeight: "bold" }}
@@ -128,7 +141,7 @@ cellRenderer: (params) => (
 
   const defaultColDef = {
     flex: 1,
-    minWidth: 160,
+    minWidth: 190,
     filter: true,
     sortable: true,
     resizable: true,

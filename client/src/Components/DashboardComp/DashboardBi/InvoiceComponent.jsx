@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import AxiosInstance from "../../../Auth/AxiosInstance";
 import "./InvoiceComponent.css";
+import { toast } from 'react-toastify';
 const validationSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
   customerName: Yup.string().required("Customer name is required"),
@@ -47,6 +48,26 @@ const InvoiceComponent = () => {
     signatureName: "",
     signatureImage: "",
   });
+
+  const initialInvoiceState = {
+    invoiceNumber: "FA2023-",
+    customerName: "",
+    invoiceDate: "",
+    dueDate: "",
+    status: "",
+    referenceNumber: "",
+    Client_ID: "",
+    product: "",
+    quantity: "",
+    rate: "",
+    discountType: "Percentage(%)",
+    discountValue: 0,
+    tax: "",
+    notes: "",
+    terms: "",
+    signatureName: "",
+    signatureImage: "",
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -113,7 +134,7 @@ const InvoiceComponent = () => {
 
   const handleChange = (eventOrName, value) => {
     formik.handleChange(eventOrName);
-  
+
     let name;
     if (typeof eventOrName === "object" && eventOrName.target) {
       const event = eventOrName;
@@ -122,21 +143,25 @@ const InvoiceComponent = () => {
     } else {
       name = eventOrName;
     }
-  
+
     formik.setFieldValue(name, value);
-  
+
     setInvoice((prevInvoice) => {
       const updatedInvoice = { ...prevInvoice, [name]: value };
-  
+
       if (name === "customerName") {
-        const selectedClient = Clients.find(client => client.ClientName === value);
+        const selectedClient = Clients.find(
+          (client) => client.ClientName === value
+        );
         if (selectedClient) {
           updatedInvoice.Client_ID = selectedClient.Client_ID;
         }
       }
-  
+
       if (name === "product") {
-        const selectedProduct = ReservationProducts.find(product => product.ProductID === parseInt(value));
+        const selectedProduct = ReservationProducts.find(
+          (product) => product.ProductID === parseInt(value)
+        );
         if (selectedProduct) {
           updatedInvoice.tax = selectedProduct.Tva;
           if (selectedProduct.Type === "Hotel") {
@@ -150,12 +175,14 @@ const InvoiceComponent = () => {
           }
         }
       }
-  
+
       return updatedInvoice;
     });
-  
+
     if (name === "product") {
-      const selectedProduct = ReservationProducts.find(product => product.ProductID === parseInt(value));
+      const selectedProduct = ReservationProducts.find(
+        (product) => product.ProductID === parseInt(value)
+      );
       if (selectedProduct) {
         const updatedProducts = products.map((product, index) => {
           if (index >= 0) {
@@ -171,8 +198,7 @@ const InvoiceComponent = () => {
       }
     }
   };
-  
-  
+
   const handleSave = async () => {
     // Convert invoice date and due date to ISO-8601 format
 
@@ -231,13 +257,17 @@ const InvoiceComponent = () => {
         "/api/v1/createInvoice",
         invoiceData
       );
-      console.log("Server response:", response);
 
       if (response.data.success) {
         console.log("Invoice created successfully", response.data);
+        toast.success('Facture créée avec succès!');
+        setInvoice(initialInvoiceState);
+        setProducts([{ name: "", quantity: 0, rate: 0 }]);
+
       }
     } catch (error) {
       console.error("Error creating invoice:", error);
+      toast.error('Erreur lors de la création de la facture!');
       if (error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
@@ -258,9 +288,9 @@ const InvoiceComponent = () => {
 
   const handleAddProduct = () => {
     const selectedProduct = ReservationProducts.find(
-      product => product.ProductID === parseInt(invoice.product)
+      (product) => product.ProductID === parseInt(invoice.product)
     );
-  
+
     const newProduct = selectedProduct
       ? {
           name: selectedProduct.Libelle,
@@ -278,10 +308,10 @@ const InvoiceComponent = () => {
           newColumn1: "",
           newColumn2: "",
         };
-  
+
     setProducts([...products, newProduct]);
   };
-  
+
   const calculateAmounts = () => {
     let taxableAmount = 0;
     let totalTaxAmount = 0;
@@ -297,18 +327,18 @@ const InvoiceComponent = () => {
 
       if (parseInt(invoice.product) === 2) {
         // Custom calculation for Billetterie
-        const newColumn2 = product.rate - product.newColumn1;
+        const newColumn2 = product.rate * product.quantity - product.newColumn1;
         productTaxableAmount = newColumn2 / (1 + product.tax / 100);
         productTaxAmount = productTaxableAmount * (product.tax / 100);
         productTotalAmount =
           parseFloat(product.rate) * parseFloat(product.quantity);
       } else {
         // Default calculation for other products
-        productTaxableAmount = product.quantity * product.rate;
+        productTaxableAmount = product.quantity * product.rate /(1 + product.tax / 100);
         productTaxAmount =
-          product.quantity * product.rate * (product.tax / 100);
+        product.quantity * product.rate / (1+ product.tax/100) * (product.tax / 100);
         productTotalAmount =
-          product.quantity * product.rate * (1 + product.tax / 100);
+        product.quantity * product.rate / (1+ product.tax/100) * (1 + product.tax / 100);
       }
 
       taxableAmount += productTaxableAmount;
@@ -378,17 +408,7 @@ const InvoiceComponent = () => {
     setProducts(updatedProducts);
   };
 
-  const handleDownloadPDF = () => {
-    const input = document.getElementById("invoice-form");
-    const options = {
-      margin: 0.5,
-      filename: `invoice_${invoice.invoiceNumber}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-   
-  };
+
   return (
     <div className="invoice-form" id="invoice-form">
       <h1>Add Invoice</h1>
@@ -424,13 +444,12 @@ const InvoiceComponent = () => {
             name="customerName"
             value={invoice.customerName}
             onChange={(value) => handleChange("customerName", value)}
-
-
-            style={{ width: "100%",height: 45 }}
+            style={{ width: "100%", height: 45 }}
             className={
-              formik.touched.customerName && formik.errors.customerName ? "select-error" : ""
+              formik.touched.customerName && formik.errors.customerName
+                ? "select-error"
+                : ""
             }
-            
           >
             {Clients.map((client, index) => (
               <Option key={index} value={client.ClientName}>
@@ -439,11 +458,11 @@ const InvoiceComponent = () => {
             ))}
           </Select>
           {formik.touched.customerName && formik.errors.customerName ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.customerName}{" "}
-          </span>
-        ) : null}
+            <span style={{ color: "red", fontSize: 11 }}>
+              {" "}
+              {formik.errors.customerName}{" "}
+            </span>
+          ) : null}
         </div>
         <div className="form-group">
           <label>Invoice Date</label>
@@ -465,7 +484,6 @@ const InvoiceComponent = () => {
               {formik.errors.invoiceDate}{" "}
             </span>
           ) : null}
-          
         </div>
         <div className="form-group">
           <label>Due Date</label>
@@ -493,30 +511,28 @@ const InvoiceComponent = () => {
         <div className="form-group">
           <label>Status</label>
           <Select
-           name="status"
+            name="status"
             value={invoice.status}
             onChange={(value) => handleChange("status", value)}
             onBlur={formik.handleBlur}
-
-            style={{ width: "100%",height: 45 }}
+            style={{ width: "100%", height: 45 }}
             className={
-              formik.touched.status && formik.errors.status ? "select-error" : ""
+              formik.touched.status && formik.errors.status
+                ? "select-error"
+                : ""
             }
-            
-            >
-
+          >
             <Option value="">Choose Status</Option>
             <Option value="Paid">Paid</Option>
             <Option value="Unpaid">Unpaid</Option>
             <Option value="Pending">Partially Paid</Option>
           </Select>
           {formik.touched.status && formik.errors.status ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.status}{" "}
-          </span>
-        ) : null}
-
+            <span style={{ color: "red", fontSize: 11 }}>
+              {" "}
+              {formik.errors.status}{" "}
+            </span>
+          ) : null}
         </div>
 
         <div className="form-group">
@@ -525,11 +541,12 @@ const InvoiceComponent = () => {
             name="product"
             value={invoice.product}
             onChange={(value) => handleChange("product", value)}
-            style={{ width: "100%",height: 45 }}
+            style={{ width: "100%", height: 45 }}
             className={
-              formik.touched.product && formik.errors.product ? "select-error" : ""
+              formik.touched.product && formik.errors.product
+                ? "select-error"
+                : ""
             }
-
           >
             <Option value="">Select Product</Option>
             {ReservationProducts.map((ReservationProducts, index) => (
@@ -540,12 +557,11 @@ const InvoiceComponent = () => {
           </Select>
 
           {formik.touched.product && formik.errors.product ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.product}{" "}
-          </span>
-        ) : null}
-
+            <span style={{ color: "red", fontSize: 11 }}>
+              {" "}
+              {formik.errors.product}{" "}
+            </span>
+          ) : null}
         </div>
         <div className="form-group">
           <label>Reference Number</label>
@@ -565,16 +581,15 @@ const InvoiceComponent = () => {
               <th>Product / Service</th>
               <th>Quantity</th>
               <th>Unit</th>
-              <th>P.U</th>
+              <th>P.U TTC</th>
               {parseInt(invoice.product) === 2 && (
-
                 <>
                   <th>Achat</th>
                   <th>Débourser</th>
                 </>
               )}
               <th>Tax</th>
-              <th>Amount</th>
+              <th>Amount H.T</th>
             </tr>
           </thead>
           <tbody>
@@ -582,15 +597,16 @@ const InvoiceComponent = () => {
               <tr key={index}>
                 <td>
                   <Input
-                    style={{ width: "100%", minWidth: "400px" }}
+                    style={{ width: "100%", minWidth: "400px",fontWeight: "bold"}}
                     type="text"
                     name="name"
                     value={product.name}
                     onChange={(e) => handleProductChange(index, e)}
-                    />
+                  />
                 </td>
                 <td>
                   <Input
+                  style={{fontWeight: "bold"}}
                     type="number"
                     name="quantity"
                     value={product.quantity}
@@ -600,6 +616,7 @@ const InvoiceComponent = () => {
                 <td>Pcs</td>
                 <td>
                   <Input
+                  style={{fontWeight: "bold"}}
                     type="number"
                     name="rate"
                     value={product.rate}
@@ -607,11 +624,11 @@ const InvoiceComponent = () => {
                   />
                 </td>
                 {parseInt(invoice.product) === 2 && (
-
                   <>
                     <td>
                       <Input
                         type="number"
+                        style={{fontWeight: "bold"}}
                         name="newColumn1"
                         value={product.newColumn1}
                         onChange={(e) => handleProductChange(index, e)}
@@ -620,6 +637,7 @@ const InvoiceComponent = () => {
                     <td>
                       <Input
                         type="number"
+                        style={{ color: "green",fontWeight: "bold"}}
                         name="newColumn2"
                         value={Number(product.newColumn2).toFixed(3)}
                         onChange={(e) => handleProductChange(index, e)}
@@ -632,6 +650,7 @@ const InvoiceComponent = () => {
                   <Input
                     type="number"
                     name="tax"
+                    style={{ color: "red", fontWeight: "bold"}}
                     value={product.tax}
                     onChange={(e) => handleProductChange(index, e)}
                     disabled
@@ -642,7 +661,7 @@ const InvoiceComponent = () => {
                   {product.tax
                     ? (
                         product.quantity *
-                        product.rate *
+                        product.rate /
                         (1 + product.tax / 100)
                       ).toFixed(3)
                     : (product.quantity * product.rate).toFixed(3)}
@@ -763,13 +782,7 @@ const InvoiceComponent = () => {
         <button type="button" className="btn btn-send" onClick={handleSend}>
           Save & Send
         </button>
-        <button
-          type="button"
-          className="btn btn-download"
-          onClick={handleDownloadPDF}
-        >
-          Download PDF
-        </button>
+     
       </div>
       <div className="qr-code-section">
         <QRCode

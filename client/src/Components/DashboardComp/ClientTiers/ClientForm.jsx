@@ -34,7 +34,7 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
 
   const formik = useFormik({
     initialValues: {
-      User_ID: "",
+      Client_ID: "",
       UserName: "",
       fullname: "",
       UserEmail: "",
@@ -51,16 +51,16 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
  
  
   useEffect(() => {
-    if (userData && userData.length > 0) {
+    if(userData) {
       formik.setValues({
-        User_ID: userData[0].User_ID,
-        UserName: userData[0].UserName,
-        fullname: userData[0].fullname,
-        UserEmail: userData[0].UserEmail,
-        Role: userData[0].Role,
-        Password: userData[0].Password,
-        password2: userData[0].Password,
-        DateOfBirth: userData[0].DateOfBirth,
+        Client_ID: userData.Client_ID,
+        ClientName: userData.ClientName,
+        ClientPhone: userData.ClientPhone,
+        ClientEmail: userData.ClientEmail,
+        ClientAddress: userData.ClientAddress,
+        ClientLocation: userData.ClientLocation,
+        Matricule_fiscale: userData.Matricule_fiscale,
+       
       });
     }
   }, [userData]);
@@ -70,74 +70,65 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
   const handleOk = async (close) => {
     console.log(close);
 
-
+await formik.handleSubmit();
  
-    if (!formik.values.UserName || !formik.values.fullname || !formik.values.UserEmail || !formik.values.Password || !formik.values.Role || !formik.values.DateOfBirth){
-      return;
-    }
+
     
     try {
       let response;
       if (!userData) {
-        response = await axiosInstance.post("/api/v1/adduser", {
-          UserName: formik.values.UserName,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Password: formik.values.Password !== "" ? formik.values.Password : undefined,
-          Role: formik.values.Role,
-          DateOfBirth: formik.values.DateOfBirth,
+        response = await axiosInstance.post("/api/V1/createClient", {
+          ClientName: formik.values.ClientName,
+          ClientPhone: formik.values.ClientPhone,
+          ClientEmail: formik.values.ClientEmail,
+          ClientAddress: formik.values.ClientAddress,
+          ClientLocation: formik.values.ClientLocation,
+          Matricule_fiscale: formik.values.Matricule_fiscale,
+         
           
         });
       } else {
         // Updating an existing user
         const updateData = {
-          User_ID: formik.values.User_ID,
-          fullname: formik.values.fullname,
-          UserEmail: formik.values.UserEmail,
-          Role: formik.values.Role,
-          num_cin: formik.values.num_cin,
-          DateOfBirth: formik.values.DateOfBirth,
+          Client_ID: formik.values.Client_ID,
+          ClientName: formik.values.ClientName,
+          ClientPhone: formik.values.ClientPhone,
+          ClientEmail: formik.values.ClientEmail,
+          ClientAddress: formik.values.ClientAddress,
+          ClientLocation: formik.values.ClientLocation,
+          Matricule_fiscale: formik.values.Matricule_fiscale,
         };
       
-       
-        if (formik.touched.Password && formik.values.Password !== "") {
-          // If modified, hash the new password
-          updateData.Password = formik.values.Password;
-        }
         console.log("Update Data:", updateData);
         // Include the updated fields in the request
         response = await axiosInstance.put(
-          "/api/v1/updateuser",
+          `/api/V1/updateClient/${formik.values.Client_ID}`,
           updateData
         );
       }
 
       console.log("Response from server:", response.data);
 
-      if (response.data.message) {
-        toast.success(response.data.message);
-    } else if (response.data.error) {
-        toast.error(response.data.error);
+    if(response.data.success) {
+      toast.success(response.data.message);
+
+    }else{
+      toast.error(response.data.message);
     }
+
     
     } catch (error) {
-      if (error.response && error.response.data) {
-        if (error.response.data === "User Already Exists" || error.response.data === "User with this email already exists") {
-          toast.error(error.response.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error.response);
-        }
-      } else if (error.data) {
-        if (error.data === "User Already Exists" || error.data === "User with this email already exists") {
-          toast.error(error.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error);
-        }
+
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        toast.error(error.response.data.message);
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        toast.error("Request error");
       } else {
-        toast.error("An unknown error occurred");
-        console.error("Error:", error);
+        console.error("Error:", error.message);
+        toast.error(error.message);
+     
       }
     } finally {
       setOpen(false);
@@ -162,53 +153,53 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
       onCancel={handleCancel}
     >
       <div>
-        <label>ID:</label>
+        <label>Code Client:</label>
         <Input 
-      value={formik.values.User_ID}
+      value={formik.values.Client_ID}
       style={{ color: "green" ,fontFamily: "bold", fontWeight: 1000 }} 
      
         disabled />
       </div>
       <div>
-        <label>Nom Agent:</label>
+        <label>Nom Client:</label>
         <Input
-        value={formik.values.fullname}
+        value={formik.values.ClientName}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        name="fullname"
+        name="ClientName"
 
         style={
-          formik.touched.fullname && formik.errors.fullname
+          formik.touched.ClientName && formik.errors.ClientName
             ? { borderColor: "red",}
             : { fontWeight: 900 }
         }
         />
-         {formik.touched.fullname && formik.errors.fullname ? (
+         {formik.touched.ClientName && formik.errors.ClientName ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.fullname}{" "}
+            {formik.errors.ClientName}{" "}
           </span>
         ) : null}
     
       </div>
       <div>
-        <label>Nom d`utilisateur:</label>
+        <label>Numéro Client:</label>
         <Input
-        value={formik.values.UserName}
+        value={formik.values.ClientPhone}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        name="UserName"
+        name="ClientPhone"
 
         style={
-          formik.touched.UserName && formik.errors.UserName
+          formik.touched.ClientPhone && formik.errors.ClientPhone
             ? { borderColor: "red" }
             :{ fontWeight: 900 }
         }
         />
-         {formik.touched.UserName && formik.errors.UserName ? (
+         {formik.touched.ClientPhone && formik.errors.ClientPhone ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.UserName}{" "}
+            {formik.errors.ClientPhone}{" "}
           </span>
         ) : null}
     
@@ -217,42 +208,42 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
         <label>Email:</label>
         <Input
           type="email"
-          value={formik.values.UserEmail}
+          value={formik.values.ClientEmail}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          name="UserEmail"
+          name="ClientEmail"
           style={
-            formik.touched.UserEmail && formik.errors.UserEmail
+            formik.touched.ClientEmail && formik.errors.ClientEmail
               ? { borderColor: "red" }
               :{ fontWeight: 900 }
           }
         />
-        {formik.touched.UserEmail && formik.errors.UserEmail ? (
+        {formik.touched.ClientEmail && formik.errors.ClientEmail ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.UserEmail}{" "}
+            {formik.errors.ClientEmail}{" "}
           </span>
         ) : null}
       </div>
 
       <div>
-        <label>Mot Passe:</label>
+        <label>Address:</label>
         <Input
-          type="password"
-          value={formik.values.Password}
+          type="text"
+          value={formik.values.ClientAddress}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          name="Password"
+          name="ClientAddress"
           style={
-            formik.touched.Password && formik.errors.Password
+            formik.touched.ClientAddress && formik.errors.ClientAddress
               ? { borderColor: "red" }
               : { fontWeight: 900 }
           }
         />
-        {formik.touched.Password && formik.errors.Password ? (
+        {formik.touched.ClientAddress && formik.errors.ClientAddress ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.Password}{" "}
+            {formik.errors.ClientAddress}{" "}
           </span>
         ) : null}
 
@@ -260,23 +251,23 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
     
 
       <div>
-        <label>Mot Passe:</label>
+        <label>Région:</label>
         <Input
-          type="password"
-          value={formik.values.password2}
+          type="text"
+          value={formik.values.ClientLocation}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          name="password2"
+          name="ClientLocation"
           style={
-            formik.touched.password2 && formik.errors.password2
+            formik.touched.region && formik.errors.ClientLocation
               ? { borderColor: "red" }
               : { fontWeight: 900 }
           }
         />
-        {formik.touched.password2 && formik.errors.password2 ? (
+        {formik.touched.ClientLocation && formik.errors.ClientLocation ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.password2}{" "}
+            {formik.errors.ClientLocation}{" "}
           </span>
         ) : null}
 
@@ -289,7 +280,7 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
 
     </div>
 
-      <div>
+      {/* <div>
         <label>Role:</label>
         <Select
          value={formik.values.Role}
@@ -311,28 +302,28 @@ const ClientForm = ({ isOpen, onClose, userData }) => {
             {formik.errors.Role}{" "}
           </span>
         ) : null}
-      </div>
+      </div> */}
 
      
       
       <div>
-        <label>Date de Naissance</label>
+        <label>Matricule Fiscale:</label>
         <Input
-          type="date"
-          value={formik.values.DateOfBirth}
+          type="text"
+          value={formik.values.Matricule_fiscale}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          name="DateOfBirth"
+          name="Matricule_fiscale"
           style={
-            formik.touched.DateOfBirth && formik.errors.DateOfBirth
+            formik.touched.Matricule_fiscale && formik.errors.Matricule_fiscale
               ? { borderColor: "red" }
               : { fontWeight: 900 }
           }
       />
-        {formik.touched.DateOfBirth && formik.errors.DateOfBirth ? (
+        {formik.touched.Matricule_fiscale && formik.errors.Matricule_fiscale ? (
           <span style={{ color: "red", fontSize: 11 }}>
             {" "}
-            {formik.errors.DateOfBirth}{" "}
+            {formik.errors.Matricule_fiscale}{" "}
           </span>
         ) : null}
       </div>

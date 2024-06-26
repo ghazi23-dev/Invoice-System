@@ -11,8 +11,8 @@ class InvoiceModel {
                         data: {
                           invoiceNumber: data.invoiceNumber,
                           customerName: data.customerName,
-                          InvoiceDate: data.InvoiceDate,
-                          dueDate: data.dueDate,
+                          InvoiceDate: new Date(data.InvoiceDate).toISOString(),
+                          dueDate: new Date(data.dueDate).toISOString(), // Convert to ISO 8601 format
                           Status: data.Status,
                           referenceNumber: data.referenceNumber,
                           DescriptionProduct: data.DescriptionProduct,
@@ -60,6 +60,7 @@ class InvoiceModel {
                         },
                         include: {
                           Items: true,
+                          client: true,
 
                         },
                       });

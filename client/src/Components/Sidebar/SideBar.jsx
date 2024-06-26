@@ -72,7 +72,7 @@ const SideBar = () => {
           // Clear user details from local storage
          
           setTimeout(() => {
-           navigate("/login");
+           navigate("/");
           }, 2000);
           localStorage.removeItem("userDetails");
           localStorage.removeItem("NotifMarked");
@@ -192,8 +192,7 @@ const SideBar = () => {
             
             <Route path="/ListeFacture" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
             <Route path="/Client" element={<PrivateRoute element={<ClientTiers />} roles={['Owner']} />} />
-            <Route path="/FactureView/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
-        
+            <Route path="/ListeFacture/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
          {/* <Route path="*" element={<Dashboard/>} /> */}
           </Routes>
         </Content>

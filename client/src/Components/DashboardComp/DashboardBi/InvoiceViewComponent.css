@@ -79,11 +79,17 @@
       .total-sections {
           text-align: right;
           font-weight: bold;
-            font-size: 20px;
+            font-size: 22px;
             margin-top: 25px;
           color: #333;
-      }
+         margin-right: 15px;
         
+      }
+      
+      .total-sections p {
+        margin-top: 5px;
+      }
+
         @media (max-width: 768px) {
           .invoice-view-details, .invoice-view-status {
             flex: 1 1 100%;

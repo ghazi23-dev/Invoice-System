@@ -1,124 +1,210 @@
-.login {
-  height: 100vh;
-  background-color: #F7F8F9;
-  background-size: cover;
-  background-repeat: no-repeat;
+/* Login.css */
+
+.login-container {
   display: flex;
+  height: 100vh;
   align-items: center;
   justify-content: center;
+  background-color: #f5f7fa;
 }
 
-.login .card {
-  width: 50%;
+.left-section,
+.right-section {
+  width: 70%;
+  padding: 40px;
+}
+
+.left-section {
+  background-color: #F8F7FC;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+  background-image: '../../assets/GSoft.png';
+}
+
+.image-container {
   display: flex;
-  background-color: white;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  min-height: 600px;
-  overflow: hidden;
-}
-
-.login .card .left {
-  flex: 1;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
-      center;
-  background-size: cover;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  color: white;
-}
-
-.login .card .left h1 {
-  font-size: 100px;
-  line-height: 100px;
-}
-
-.login .card .left p {
-  font-weight: 800;
-  font-style: bold;
-}
-
-.login .card .left span {
-  font-size: 14px;
-}
-
-.login .card .left button {
-  width: 50%;
-  padding: 10px;
-  border: none;
-  background-color: #ffffff; /* Add '#' before the color code */
-  color: rgb(8, 8, 8);
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.login .card .right {
-  flex: 1;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
   justify-content: center;
+  align-items: center;
 }
 
-.login .card .right h1 {
-  color: #555;
+.image-container img {
+  width: 20%;
+  height: 20%;
+  border-radius: 10px 0 0 10px;
+  margin-top: 7%;
+  margin-right: 25%;
 }
 
-.login .card .right form {
+
+
+.right-section {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+  background-color: #fff;
+  border-radius: 8px 20px 20px 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  justify-content: center;
+  height: 96%;
+  width: 26%;
 }
 
-.login .card .right form input {
-  border: none;
-  border-bottom: 1px solid rgb(0, 0, 0);
-  padding: 20px 10px;
-  width: 350px;
+.right-section h1 {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 20%;
+  left: 0;
+  right: 0;
+}
+
+h1 {
+  color: #333;
+}
+
+.left-section p {
+  color: #3F4254;
+  font-size: 18px;
+  margin: 4px 6px;
   font-weight: 900;
+  text-align: center;
+  margin-right: 450px;
+  position: relative;
+  top: 50px;
+
 }
 
-.login .card .right form button {
-  width: 50%;
-  padding: 10px;
-  margin-left: 80px;
+.left-section h1 {
+  color: #000000;
+  font-size: 30px;
+  margin: 20px 0;
+  
+}
+
+.stats {
+  display: flex;
+  margin: 30px 0;
+  padding: 30px;
+}
+
+.stats div {
+  text-align: center;
+}
+
+
+
+.stats span {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #3f4254a1;
+  margin-left: 120px;
+  margin-right: 101px;
+  
+}
+
+.stats span:first-child {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  top: 50px;
+  
+}
+
+.stats span:last-child {
+  display: block;
+  color: #1869D0;
+  position: relative;
+  top: 50px;
+}
+
+.register-button {
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 20px;
   border: none;
-  background-color: #f0c033; /* Fix the color code */
-  color: white;
-  font-weight: bold;
+  border-radius: 5px;
   cursor: pointer;
+  margin: 20px 0;
 }
+
+.contact-info {
+  color: #1869D0;
+  font-size: 14px;
+  margin-top: 20px;
+  font-weight: 800;
+
+}
+
+.contact-info div {
+  margin-bottom: 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+ 
+}
+
+
+
+.right-section input{
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 10px;
+
+  
+}
+
+.right-section input:focus{
+
+  outline: 1px solid #1869D0;  
+  
+}
+
+
+
+button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+ 
+}
+
 .error-message {
-  color: red; /* Change to your desired color */
-  font-weight: bold;
-  font-size: 12px;
-  margin-top: -15px;
-  margin-left: 10px;
+  color: red;
+  font-weight: 600;
+  font-size: 11px;
+  margin-top: 2px;
+  margin-bottom: 5px;
+ 
 }
 
-
-@media only screen and (max-width: 968px) {
-  .login .card {
-    flex-direction: column; /* Stack left and right sections vertically */
-  }
-
-  .login .card .left {
-    flex: 1; /* Expand the left side to fill the entire height */
-  }
-  .login .card .left {
-    display: none; /* Hide the right side by default */
-  }
-  .login .card .right form input{
-    width: 100%;
-    padding-left: 10px;
-    margin-left: 0px;
-  }
-
-  .login .card .right {
-    display: block; /* Show the right side on smaller screens */
-  }
+a {
+  color: #1059a7;
+  text-decoration: none;
+  margin-top: 10px;
 }
+
