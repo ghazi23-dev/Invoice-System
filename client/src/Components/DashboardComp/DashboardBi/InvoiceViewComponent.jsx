@@ -158,7 +158,7 @@ const InvoiceViewComponent = () => {
                     style={{ fontWeight: "bold" }}
                     type="number"
                     name="rate"
-                    value={item.Rate}
+                    value={Number(item.Rate).toFixed(3)}
                   />
                 </td>
                 {invoiceData.DescriptionProduct === "Billetterie" && (

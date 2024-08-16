@@ -59,10 +59,10 @@ const Dashboard = () => {
       'DATE ENTREE': '',
       REGLEMENT: '',
       'N° RECU': '',
-      'PRIX VENTE': '',
-      'PRIX ACHAT': '',
-      AVANCE: '',
-      RESTE: '',
+      'PRIX VENTE': '0',
+      'PRIX ACHAT': '0',
+      AVANCE: '0',
+      RESTE: '0',
       OBSERVATION: '',
       isNew: true
     }]);

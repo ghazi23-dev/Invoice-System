@@ -166,13 +166,16 @@ export default function Login() {
           ) : null}
           {isLoading ? (
             <Button
-              style={{ backgroundColor: "#007bff", color: "white" }}
+              style={{ backgroundColor: "#007bff", color: "white",height: "40px"}}
               disabled
             >
               Loading...
             </Button>
           ) : (
-            <button type="submit">Se connecter</button>
+            <button 
+            style={{ backgroundColor: "#007bff", color: "white"}}
+            
+            type="submit">Se connecter</button>
           )}
         </form>
 

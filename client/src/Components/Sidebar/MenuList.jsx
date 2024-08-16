@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileInvoice,faFileInvoiceDollar ,faListCheck, faBuilding,faUsers,faSackDollar,faCubesStacked,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar, faList12 } 
+import {faFileInvoiceDollar ,faUserTie, faBuilding,faUsers,faSliders,faUserShield,faTimeline,faCirclePlus,faWarehouse,faHistory,faFilePdf,faHandHoldingDollar, faList12 } 
   from '@fortawesome/free-solid-svg-icons';
 import { HomeOutlined, UsergroupDeleteOutlined,  SettingOutlined ,} from '@ant-design/icons';
 import './Sidebar.css';
@@ -45,11 +45,14 @@ useEffect(() => {
         <Link to="/Dashboard/Home/Agent">Dashboard</Link>
       </Menu.Item>
        ) : null}
+
+       
         {(isAdmin) ? (
       <Menu.Item key="home" icon={<HomeOutlined />}>
         <Link to="/Dashboard/Home">Dashboard</Link>
       </Menu.Item>
             ) : null}
+
 
 {(isAdmin) ? (
       <Menu.Item key="Agence"icon={<FontAwesomeIcon icon={faBuilding} />} >
@@ -57,16 +60,23 @@ useEffect(() => {
       </Menu.Item>
             ) : null}
 
+{(isAdmin) ? (
+        <Menu.Item key="employer" icon={<FontAwesomeIcon icon={faUserShield} />} >
+          <Link to="/Dashboard/Agent">Agent</Link>
+        </Menu.Item>
+      ) : null}
+
+
             
 
 {(isAdmin) ? (
-      <Menu.Item key="Client"icon={<FontAwesomeIcon icon={faBuilding} />} >
+      <Menu.Item key="Client"icon={<FontAwesomeIcon icon={faUserTie} />} >
         <Link to="/Dashboard/Client">Client</Link>
       </Menu.Item>
             ) : null}
 
 
-<Menu.SubMenu key='Facturation' title="Facturation" icon={<FontAwesomeIcon icon={faFileInvoice} />} >
+<Menu.SubMenu key='Facturation' title="Facturation" icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
         <Menu.Item key="Facture" icon={<FontAwesomeIcon icon={faCirclePlus} />}>
           <Link to="/Dashboard/DashboardBi">Ajouter Facture</Link>
         </Menu.Item>
@@ -91,17 +101,12 @@ useEffect(() => {
 
 
 {(isAdmin) ? (
-      <Menu.Item key="Produit_Reservation"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
+      <Menu.Item key="Produit_Reservation"icon={<FontAwesomeIcon icon={faSliders} />} >
         <Link to="/Dashboard/Produit_Reservation">Produit Reservation</Link>
       </Menu.Item>
             ) : null}
 
-      {(isAdmin) ? (
-        <Menu.Item key="employer" icon={<UsergroupDeleteOutlined />}>
-          <Link to="/Dashboard/Agent">Agent</Link>
-        </Menu.Item>
-      ) : null}
-
+    
 
 
 
@@ -147,7 +152,7 @@ useEffect(() => {
 
      
      
-        <Menu.Item key="fournisseur" icon={<FontAwesomeIcon icon={faUsers} />}>
+        <Menu.Item key="fournisseur" icon={<FontAwesomeIcon icon={faUserShield} />}>
         <Link to="/Dashboard/Fournisseur">Fournisseur</Link>
       </Menu.Item>
      

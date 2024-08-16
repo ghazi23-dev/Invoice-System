@@ -5,7 +5,7 @@
   height: 100vh;
   align-items: center;
   justify-content: center;
-  background-color: #f5f7fa;
+  background-color: #f7faf5;
 }
 
 .left-section,
@@ -15,7 +15,7 @@
 }
 
 .left-section {
-  background-color: #F8F7FC;
+  background-color: #f8f7fc00;
   border-radius: 10px 0 0 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
@@ -49,7 +49,7 @@
   margin-right: 20px;
   background-color: #fff;
   border-radius: 8px 20px 20px 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.342);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -184,7 +184,7 @@ input {
 
 button[type="submit"] {
   background-color: #007bff;
-  color: #fff;
+  color: #d10606;
   padding: 10px;
   border: none;
   border-radius: 5px;
@@ -192,6 +192,12 @@ button[type="submit"] {
   margin-top: 20px;
  
 }
+
+button[type="submit"]:hover {
+  background-color: #0163cc;
+}
+
+
 
 .error-message {
   color: red;

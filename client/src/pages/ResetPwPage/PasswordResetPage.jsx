@@ -88,6 +88,19 @@ const PasswordResetPage = () => {
                 >
                   Réinitialiser le mot de passe
                 </Button>
+                <Button onClick={HomeNavigation}
+                type="dashed"
+
+                 style={{
+                  width: "100%",
+                  height: "40px",
+                  marginTop: "0px",
+                  marginBottom: "4px",
+                }}>
+               
+                  Retour à l`accueil
+                  
+                  </Button>
               </Form.Item>
             </Form>
           )}

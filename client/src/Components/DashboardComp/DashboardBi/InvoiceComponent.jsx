@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import "./InvoiceComponent.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Button, Select, Input } from "antd";
+import { Button, Select, Input,Tooltip  } from "antd";
 import QRCode from "qrcode.react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import AxiosInstance from "../../../Auth/AxiosInstance";
 import "./InvoiceComponent.css";
 import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+
 const validationSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
   customerName: Yup.string().required("Customer name is required"),
@@ -23,6 +25,7 @@ const validationSchema = Yup.object().shape({
 const { Option } = Select;
 
 const InvoiceComponent = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([
     { name: "", quantity: 0, rate: 0 },
   ]);
@@ -408,6 +411,9 @@ const InvoiceComponent = () => {
     setProducts(updatedProducts);
   };
 
+  const handleClientNavigationPage = () => {
+    navigate("/Dashboard/Client");
+  };
 
   return (
     <div className="invoice-form" id="invoice-form">
@@ -463,6 +469,19 @@ const InvoiceComponent = () => {
               {formik.errors.customerName}{" "}
             </span>
           ) : null}
+        </div>
+        <div className="btn-client-add">
+          <Tooltip title="Ajouter un client">
+          
+           
+        <Button 
+        type="primary"
+       
+onClick={handleClientNavigationPage}>
+         +
+
+        </Button>
+        </Tooltip>
         </div>
         <div className="form-group">
           <label>Invoice Date</label>
