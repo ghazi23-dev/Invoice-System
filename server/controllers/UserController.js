@@ -1,6 +1,7 @@
 const UserModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+require('dotenv').config();
 
 class UserController {
   static async addUser(req, res) {
@@ -65,9 +66,10 @@ class UserController {
         const { User_ID, UserName, fullname, Role, Agency_ID } = login.user;
         const token = jwt.sign(
           { User_ID, UserName, fullname, UserEmail, Role, Agency_ID },
-          "secret",
+          process.env.JWT_SECRET,
           { expiresIn: "3h" }
         );
+       
         res.cookie("token", token, { httpOnly: true });
         res.json({ success: true, user: login.user, token: token });
       } else {
@@ -82,6 +84,7 @@ class UserController {
       res.status(500).json({ error: "There was an error while logging in" });
     }
   }
+  
 
   static async logout(_, res) {
     res.clearCookie("token");
@@ -96,7 +99,7 @@ class UserController {
           .status(401)
           .json({ error: "Unauthorized: No token provided" });
       }
-      jwt.verify(token, "secret", (err, decoded) => {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
           return res.status(401).json({ error: "Unauthorized" });
         }
