@@ -33,7 +33,7 @@ const InvoiceComponent = () => {
   const [Clients, setClients] = useState([]);
 
   const [invoice, setInvoice] = useState({
-    invoiceNumber: "FA2023-",
+    invoiceNumber: ``,
     customerName: null,
     invoiceDate: "",
     dueDate: "",
@@ -53,7 +53,7 @@ const InvoiceComponent = () => {
   });
 
   const initialInvoiceState = {
-    invoiceNumber: "FA2023-",
+    invoiceNumber: "",
     customerName: "",
     invoiceDate: "",
     dueDate: "",
@@ -116,6 +116,22 @@ const InvoiceComponent = () => {
     fetchProducts();
   }, []);
 
+  const handleInvoiceNumberFetch = async () => {
+    try {
+      const response = await AxiosInstance.get("/api/v1/getLastInvoiceNumber");
+  
+      // Assuming the response is a string, update the invoice's invoiceNumber field
+      setInvoice((prevInvoice) => ({
+        ...prevInvoice,
+        invoiceNumber: response.data, // Update invoiceNumber in the invoice state
+      }));
+    } catch (error) {
+      console.error("Error fetching last invoice number:", error);
+    }
+  };
+  
+  
+
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -133,6 +149,7 @@ const InvoiceComponent = () => {
     };
 
     fetchClients();
+    handleInvoiceNumberFetch();
   }, []);
 
   const handleChange = (eventOrName, value) => {

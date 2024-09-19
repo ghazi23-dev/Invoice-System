@@ -9,6 +9,7 @@ InvoiceRouter.post('/api/v1/createInvoice', authenticateToken,InvoiceController.
 InvoiceRouter.get('/api/v1/getInvoiceByID/:InvoiceID', authenticateToken,InvoiceController.getInvoiceByID);
 InvoiceRouter.get('/api/v1/getInvoices', authenticateToken,InvoiceController.getInvoices);
 
+InvoiceRouter.get('/api/v1/getLastInvoiceNumber',InvoiceController.getLastInvoiceNumber);
 
 
 

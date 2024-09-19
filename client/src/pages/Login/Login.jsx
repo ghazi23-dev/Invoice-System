@@ -186,9 +186,26 @@ export default function Login() {
           Pas encore membre? S`inscrire
         </Button>
         <a href="/ResetPassword">Mot de passe oublié ?</a>
+
+        
     
       </div>
+
+      <div className="bottom-navbar">
+  <div className="bottom-links">
+    {/* <a href="/terms">Terms of Service</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/contact">Contact Us</a> */}
+  </div>
+  <div className="copyright">
+    <p>© 2024 GSoft Innovations. All rights reserved.</p>
+  </div>
+</div>
+
     </div>
+
+    
+    
   );
 }
 

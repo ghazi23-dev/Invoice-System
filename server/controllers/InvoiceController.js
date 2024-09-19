@@ -44,6 +44,16 @@ class InvoiceController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+
+  static async getLastInvoiceNumber(req, res) {
+    try {
+      const invoice = await InvoiceModel.getLastInvoiceNumber();
+      res.json(invoice);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 }
 
 module.exports = InvoiceController;

@@ -17,7 +17,11 @@ const App = () => {
       
         <Route path="/"element={<Login />}/>
         {/* <Route path="/Signup"element={<><Navbar /><Signup /></>}/> */}
-        <Route path="*"element={<ErrorPage />}/>
+        {/* For Build Website Into Cpanel Point Routers */}
+        <Route path="*"element={<Login />}/>
+
+
+    {/* <Route path="*"element={<ErrorPage />}/> */}
 
         <Route path="/dashboard/*"element={<><PrivateRoute element={<SideBar />} /></>}/>
         <Route path="/Signup"element={<><Signup /></>}/>

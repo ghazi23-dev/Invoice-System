@@ -16,6 +16,7 @@ import { ToWords } from "to-words";
 import QRCode from "qrcode";
 import NunitoRegular from "../../../assets/Fonts/Nunito-Regular.ttf";
 import NunitoExtraBold from "../../../assets/Fonts/Nunito-ExtraBold.ttf";
+import stamp from "../../../assets/stamp.png";
 
 
 
@@ -263,6 +264,7 @@ const Row_PDF_Reglement_Quittance = ({ record }) => {
                   (amount % 1).toFixed(3).substring(2)}{" "}
                 millimes
               </Text>
+              <Image src={stamp} style={styles.stamp} />
             </>
           )}
 
@@ -302,6 +304,15 @@ const styles = StyleSheet.create({
     width: 95,
     height: 105,
   },
+  stamp: {
+    width: 200,
+    height: 140,
+    marginTop: 13,
+    position: "absolute",
+    right: 40,  // Adjust this value as needed
+    bottom: 80,  // Adjust this value as needed
+},
+
   titleContainer: {
     flexGrow: 1,
     textAlign: "center",

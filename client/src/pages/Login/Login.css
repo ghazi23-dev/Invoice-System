@@ -53,8 +53,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 96%;
-  width: 26%;
+  height: 92%;
+  width: 25%;
 }
 
 .right-section h1 {
@@ -214,3 +214,29 @@ a {
   margin-top: 10px;
 }
 
+.bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #071E3D;
+  text-align: center;
+  padding: 5px;
+  border-top: 3px solid #ffffff;
+}
+
+.bottom-links a {
+  margin: 0 15px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.bottom-links a:hover {
+  text-decoration: underline;
+}
+
+.copyright {
+  margin-top: 5px;
+  font-size: 15px;
+  
+  color: #ffffff;
+}
