@@ -71,7 +71,7 @@ class UserController {
           { expiresIn: "3h" }
         );
        
-        res.cookie("token", token, { httpOnly: true });
+        res.cookie('token', token, { maxAge: 3500000, httpOnly: true, sameSite:'None', secure: true,  });
         res.json({ success: true, user: login.user, token: token });
       } else {
         if (login.message === "User not activated") {
