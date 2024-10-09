@@ -54,6 +54,22 @@ class InvoiceController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+
+  static async DeleteInvoice(req, res) {
+    const { InvoiceID } = req.params;
+    try {
+      const invoice = await InvoiceModel.DeleteInvoice(InvoiceID);
+      res.json(invoice);
+    } catch (error) {
+      if (error.code === 'P2003') {
+        res.status(400).json({ error: "Cannot delete invoice. It has related records." });
+      } else {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  }
+  
 }
 
 module.exports = InvoiceController;

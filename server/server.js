@@ -6,17 +6,48 @@ const cors = require("cors");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 require('dotenv').config();
+const path = require('path');
+
+
+
+
+
+// app.post('/generate-invoice', async (req, res) => {
+//     try {
+//         const invoiceData = {
+//             customerName: req.body.customerName || 'John Doe',
+//             totalAmount: req.body.totalAmount || '150.00',
+//             date: new Date().toLocaleDateString(),
+//         };
+
+//         const fileName = `invoice_${Date.now()}`;
+//         const pdfPath = await generateInvoicePDF(invoiceData, fileName);
+
+//         res.json({ message: 'Invoice generated successfully', pdfPath });
+//     } catch (error) {
+//         res.status(500).json({ error: 'Failed to generate invoice PDF' });
+//     }
+// });
+
+
+
+
 
 
 app.use(cors({
-  // origin: "http://localhost:5173",
-  origin: "https://facturations.kayanvoyages.tn",
+  origin: "http://localhost:5173",
+  // origin: "https://facturations.kayanvoyages.tn",
   methods: ["POST", "GET", "PUT", "DELETE"],
   credentials: true,
 
 }));
 
 app.use(cookieParser());
+
+
+app.use('/pdfs', express.static(path.join(__dirname, '../pdfs')));
+
+
 
 
 
@@ -45,6 +76,11 @@ app.use(InvoiceRouter);
 /*/ CLIENT ROUTER /*/
 const ClientRouter = require("./routes/ClientRouter");
 app.use(ClientRouter);
+
+
+const ffRouter = require("./routes/ff");
+app.use(ffRouter);
+
 
 
 

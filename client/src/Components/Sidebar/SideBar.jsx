@@ -27,6 +27,7 @@ import Produit_Reservation from "../DashboardComp/Produit_Reservation/Produit_Re
 import Invoice_List from "../DashboardComp/DashboardBi/InvoiceList";
 import ClientTiers from "../DashboardComp/ClientTiers/Client";
 import InvoiceViewForm from "../DashboardComp/DashboardBi/InvoiceViewComponent"
+import PDF from "../DashboardComp/PDF_Files/PDF";
 const SideBar = () => {
   const { Header, Sider, Content } = Layout;
   const [darkTheme, setDarkTheme] = useState(true);
@@ -193,6 +194,7 @@ const SideBar = () => {
             <Route path="/ListeFacture" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
             <Route path="/Client" element={<PrivateRoute element={<ClientTiers />} roles={['Owner']} />} />
             <Route path="/ListeFacture/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
+            <Route path="/PDF" element={<PrivateRoute element={<PDF />} roles={['Owner']} />} />
          {/* <Route path="*" element={<Dashboard/>} /> */}
           </Routes>
         </Content>

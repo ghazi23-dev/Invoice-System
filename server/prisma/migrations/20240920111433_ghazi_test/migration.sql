@@ -1,0 +1,141 @@
+-- CreateTable
+CREATE TABLE `User` (
+    `User_ID` INTEGER NOT NULL AUTO_INCREMENT,
+    `UserName` VARCHAR(191) NOT NULL,
+    `fullname` VARCHAR(191) NOT NULL,
+    `UserEmail` VARCHAR(191) NOT NULL,
+    `Role` VARCHAR(191) NOT NULL,
+    `Password` VARCHAR(191) NOT NULL,
+    `DateOfBirth` VARCHAR(191) NOT NULL,
+    `tag_actif` INTEGER NOT NULL DEFAULT 1,
+    `Agency_ID` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `User_UserEmail_key`(`UserEmail`),
+    PRIMARY KEY (`User_ID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Agency` (
+    `Agency_ID` INTEGER NOT NULL AUTO_INCREMENT,
+    `AgencyName` VARCHAR(191) NOT NULL,
+    `AgencyAddress` VARCHAR(191) NOT NULL,
+    `AgencyPhone` VARCHAR(191) NOT NULL,
+    `AgencyEmail` VARCHAR(191) NOT NULL,
+    `AgencyLocation` VARCHAR(191) NOT NULL,
+    `SuperAdminID` INTEGER NOT NULL,
+    `Matricule_fiscale` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `AdminID` INTEGER NULL,
+
+    UNIQUE INDEX `Agency_AdminID_key`(`AdminID`),
+    PRIMARY KEY (`Agency_ID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Client` (
+    `Client_ID` INTEGER NOT NULL AUTO_INCREMENT,
+    `ClientName` VARCHAR(191) NOT NULL,
+    `ClientPhone` VARCHAR(191) NOT NULL,
+    `ClientEmail` VARCHAR(191) NOT NULL,
+    `ClientAddress` VARCHAR(191) NOT NULL,
+    `ClientLocation` VARCHAR(191) NOT NULL,
+    `Matricule_fiscale` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`Client_ID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Achat_Reservation` (
+    `AchatID` INTEGER NOT NULL AUTO_INCREMENT,
+    `DATE` DATE NOT NULL,
+    `AGENT` VARCHAR(191) NOT NULL,
+    `DESIGNATION` VARCHAR(191) NOT NULL,
+    `PLATEFORME` VARCHAR(191) NOT NULL,
+    `NOM_CLIENT` VARCHAR(191) NOT NULL,
+    `CONTACT_CLIENT` VARCHAR(191) NOT NULL,
+    `DATE_ENTREE` DATE NOT NULL,
+    `REGLEMENT` VARCHAR(191) NOT NULL,
+    `NUMERO_RECU` VARCHAR(191) NOT NULL,
+    `PRIX_VENTE` DOUBLE NOT NULL,
+    `PRIX_ACHAT` DOUBLE NOT NULL,
+    `AVANCE` DOUBLE NOT NULL,
+    `RESTE` DOUBLE NOT NULL,
+    `OBSERVATION` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`AchatID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Invoice` (
+    `InvoiceID` INTEGER NOT NULL AUTO_INCREMENT,
+    `invoiceNumber` VARCHAR(191) NOT NULL,
+    `customerName` VARCHAR(191) NOT NULL,
+    `InvoiceDate` DATE NOT NULL,
+    `dueDate` DATE NOT NULL,
+    `Status` VARCHAR(50) NOT NULL,
+    `referenceNumber` VARCHAR(191) NULL,
+    `DescriptionProduct` VARCHAR(191) NOT NULL,
+    `TotalHT` DECIMAL(10, 3) NOT NULL,
+    `Discount` DECIMAL(10, 3) NOT NULL,
+    `Tva` DECIMAL(10, 3) NOT NULL,
+    `Timbre_Fiscal` DECIMAL(10, 3) NOT NULL,
+    `TotalAmount` DECIMAL(10, 3) NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `clientId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`InvoiceID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `InvoiceItems` (
+    `InvoiceItemID` INTEGER NOT NULL AUTO_INCREMENT,
+    `InvoiceID` INTEGER NOT NULL,
+    `ProductID` INTEGER NOT NULL,
+    `Description` VARCHAR(191) NOT NULL,
+    `Quantity` INTEGER NOT NULL,
+    `DiscountType` VARCHAR(191) NOT NULL,
+    `DiscountValue` DECIMAL(10, 3) NOT NULL,
+    `Tax` VARCHAR(191) NOT NULL,
+    `TotalTTC` DECIMAL(10, 3) NOT NULL,
+    `Montant_Achat` DECIMAL(10, 3) NULL,
+    `Montant_Debourser` DECIMAL(10, 3) NULL,
+    `Notes` VARCHAR(191) NOT NULL,
+    `Terms` VARCHAR(191) NOT NULL,
+    `SignatureName` VARCHAR(191) NOT NULL,
+    `Discount` DOUBLE NOT NULL,
+    `Rate` DECIMAL(10, 3) NOT NULL,
+    `Amount` DECIMAL(10, 3) NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`InvoiceItemID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Product` (
+    `ProductID` INTEGER NOT NULL AUTO_INCREMENT,
+    `Libelle` VARCHAR(191) NOT NULL,
+    `Type` VARCHAR(191) NOT NULL,
+    `Created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `Tva` DOUBLE NOT NULL,
+
+    PRIMARY KEY (`ProductID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Agency` ADD CONSTRAINT `Agency_SuperAdminID_fkey` FOREIGN KEY (`SuperAdminID`) REFERENCES `User`(`User_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Agency` ADD CONSTRAINT `Agency_AdminID_fkey` FOREIGN KEY (`AdminID`) REFERENCES `User`(`User_ID`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_clientId_fkey` FOREIGN KEY (`clientId`) REFERENCES `Client`(`Client_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItems` ADD CONSTRAINT `InvoiceItems_InvoiceID_fkey` FOREIGN KEY (`InvoiceID`) REFERENCES `Invoice`(`InvoiceID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItems` ADD CONSTRAINT `InvoiceItems_ProductID_fkey` FOREIGN KEY (`ProductID`) REFERENCES `Product`(`ProductID`) ON DELETE RESTRICT ON UPDATE CASCADE;

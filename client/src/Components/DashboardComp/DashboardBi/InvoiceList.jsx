@@ -3,14 +3,14 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../Auth/AxiosInstance";
 import "ag-grid-community/styles/ag-theme-material.css";
 import { FilePdfFilled,  } from "@ant-design/icons";
-import { Button, Space, Modal, Tag } from "antd";
+import { Button, Space, Modal, Tag, message } from "antd";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import PDFRenderComponent from "./Row_PDF_Reglement_Quittance";
-import { PDFDownloadLink,  } from "@react-pdf/renderer";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faDownload,faEye,} from "@fortawesome/free-solid-svg-icons";
+import {faDownload,faEye,faTrash} from "@fortawesome/free-solid-svg-icons";
 import InvoiceViewForm from "./InvoiceViewComponent";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
@@ -55,11 +55,36 @@ const Invoice_List = () => {
     }
   };
   
-  const handleDownloadClick = async (invoiceID) => {
+  const handleDownloadClick = async (invoiceID, invoiceNumber) => {
     setDownloadInvoiceID(invoiceID);
-
-
     
+    // Generate the PDF
+    const blob = await pdf(<PDFRenderComponent record={data.find(item => item.InvoiceID === invoiceID)} />).toBlob();
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', blob, `Invoice_${invoiceNumber}.pdf`);
+    
+    // Send the PDF to the server
+    try {
+      const response = await axiosInstance.post(`/api/v1/saveInvoicePdf/${invoiceNumber}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('PDF saved successfully!', response.data);
+      message.success('PDF saved successfully!');
+      
+      // Once saved, trigger the download
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `Invoice_${invoiceNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+    }
   };
  
 
@@ -69,10 +94,10 @@ const Invoice_List = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await axiosInstance.delete(`/api/v1/deleteuser/${deleteItemId}`);
+      const response = await axiosInstance.delete(`/api/v1/deleteInvoice/${deleteItemId}`);
       console.log("Response from server:", response.data);
-      setData(data.filter((item) => item.User_ID !== deleteItemId));
-      toast.success("User deleted successfully!");
+      setData(data.filter((item) => item.InvoiceID !== deleteItemId));
+      message.success(`Invoice deleted successfully! ${response.data.invoiceNumber} `);
     } catch (error) {
       console.error("Error deleting data from server:", error);
       toast.warn("Un Achat associé a cet Utilisateurs.");
@@ -217,40 +242,34 @@ const Invoice_List = () => {
     {
       headerName: "Action",
       field: "actions",
-    
       cellRenderer: (params) => (
         <Space size="middle">
-        {downloadInvoiceID === params.data.InvoiceID ? (
-          <PDFDownloadLink
-            document={<PDFRenderComponent record={params.data} />}
-            fileName={`Facture N°${params.data.invoiceNumber}.pdf`}
-          >
-            {({ loading }) =>
-              loading ? (
-                <Button loading icon={<FilePdfFilled />}></Button>
-              ) : (
-                <Button icon={<FilePdfFilled />}></Button>
-              )
-            }
-          </PDFDownloadLink>
-        ) : (
           <Button
             style={{ color: 'black', fontWeight: 'bold' }}
             icon={<FontAwesomeIcon icon={faDownload} size="lg" />}
             onClick={() => {
-              handleDownloadClick(params.data.InvoiceID);
-              
+              handleDownloadClick(params.data.InvoiceID, params.data.invoiceNumber);
             }}
           />
-        )}
-        <Button
-          style={{ color: 'black', fontWeight: 'bold' }}
-          icon={<FontAwesomeIcon icon={faEye} size="lg" />}
-          onClick={() => viewInvoice1(params.data.InvoiceID)}
-        />
-      </Space>
+          <Button
+          style={{ color: 'red', fontWeight: 'bold' }}
+          icon={<FontAwesomeIcon icon={faTrash} size="lg" />}
+          onClick={() => {
+            setDeleteModalVisible(true);
+            setDeleteItemId(params.data.InvoiceID);
+          }
+          }
+          
+          />
+          <Button
+            style={{ color: 'black', fontWeight: 'bold' }}
+            icon={<FontAwesomeIcon icon={faEye} size="lg" />}
+            onClick={() => viewInvoice1(params.data.InvoiceID)}
+          />
+        </Space>
       ),
     },
+    
   ];
 
   const defaultColDef = {

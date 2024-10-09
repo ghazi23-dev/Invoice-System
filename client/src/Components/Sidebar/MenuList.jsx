@@ -157,7 +157,7 @@ useEffect(() => {
       </Menu.Item>
      
       <Menu.Item key="settings" icon={<SettingOutlined />}>
-        <Link to="/Dashboard/Parametre">Paramètres</Link>
+        <Link to="/Dashboard/PDF">Paramètres PDF</Link>
       </Menu.Item>
     </Menu>
   );

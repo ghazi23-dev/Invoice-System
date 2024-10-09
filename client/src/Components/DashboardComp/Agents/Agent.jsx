@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "ag-grid-community/styles/ag-theme-material.css";
 import PopupForm from "./PopupForm";
-import { Button,Space, Modal,Tag } from "antd";
+import { Button,Space, Modal,Tag ,message} from "antd";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -60,7 +60,7 @@ const Agent = () => {
       setPopupOpen(true);
     } catch (error) {
       console.error("Error fetching user data:", error);
-      toast.error("Failed to fetch user data.");
+      message.error("Failed to fetch user data.");
     }
   };
 
@@ -71,10 +71,10 @@ const Agent = () => {
       );
       console.log("Response from server:", response.data);
       setData(data.filter((item) => item.User_ID !== deleteItemId));
-      toast.success("User deleted successfully!");
+      message.success("User deleted successfully!");
     } catch (error) {
       console.error("Error deleting data from server:", error);
-      toast.warn("Un Achat associé a cet Utilisateurs.");
+      message.warn("Un Achat associé a cet Utilisateurs.");
     } finally {
       setDeleteModalVisible(false);
     }
@@ -104,15 +104,15 @@ const Agent = () => {
 
       // Check if the request was successful
       if (res.status === 200) {
-        toast.success(
+        message.success(
           `User ${currentStatus ? "desactivated" : "activated"} successfully.`
         );
         fetchData();
       } else {
-        toast.error("Failed to toggle user activation status.");
+        message.error("Failed to toggle user activation status.");
       }
     } catch (error) {
-      toast.error("An error occurred while toggling user activation status.");
+      message.error("An error occurred while toggling user activation status.");
       console.error("Error:", error);
     }
   };

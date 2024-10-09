@@ -119,6 +119,7 @@ const Produit_Reservation = () => {
     
     
   },
+ 
     { headerName: "Type Réservation", field: "Type",
     cellRenderer: (params) => {
       let tagColor;
@@ -142,8 +143,22 @@ const Produit_Reservation = () => {
     
       return <Tag color={tagColor}>{params.value}</Tag>;
     },
+
+    
       
      },
+
+     { headerName: "TVA", 
+      field: "Tva",
+      cellRenderer: (params) => (
+        
+        <Tag color="blue-inverse">
+          {Number(params.value).toFixed(3)}%
+        </Tag>
+      ),
+      
+      
+    },
     { headerName: "Date Création", field: "Created_at" },
 
  

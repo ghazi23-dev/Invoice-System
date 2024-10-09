@@ -25,13 +25,7 @@ import stamp from "../../../assets/stamp.png";
 const Row_PDF_Reglement_Quittance = ({ record }) => {
 
 
-
-
-  
-
-  
-
-
+  const { client } = record; // Extract client data
 
   const [localData, setLocalData] = useState("");
   const uniqueTaxes = [...new Set(record.Items.map((item) => item.Tax))];

@@ -120,6 +120,28 @@ class InvoiceModel {
       throw error;
     }
   }
+
+  static async DeleteInvoice(InvoiceID) {
+    try {
+      // Optionally, first delete related records (like items)
+      await prisma.invoiceItems.deleteMany({
+        where: {
+          InvoiceID: parseInt(InvoiceID), // Assuming invoiceItem has an invoiceId foreign key
+        },
+      });
+  
+      // Now delete the invoice
+      const invoice = await prisma.invoice.delete({
+        where: {
+          InvoiceID: parseInt(InvoiceID),
+        },
+      });
+      return invoice;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
   
 
 }

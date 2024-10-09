@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./InvoiceComponent.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Button, Select, Input,Tooltip  } from "antd";
+import { Button, Select, Input,Tooltip,message  } from "antd";
 import QRCode from "qrcode.react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,9 +10,11 @@ import AxiosInstance from "../../../Auth/AxiosInstance";
 import "./InvoiceComponent.css";
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
-
+import PDFRenderComponent from "./Row_PDF_Reglement_Quittance";
+import {  pdf } from "@react-pdf/renderer";
+import axiosInstance from "../../../Auth/AxiosInstance";
 const validationSchema = Yup.object().shape({
-  invoiceNumber: Yup.string().required("Invoice number is required"),
+  //invoiceNumber: Yup.string().required("Invoice number is required"),
   customerName: Yup.string().required("Customer name is required"),
   invoiceDate: Yup.date().required("Invoice date is required"),
   dueDate: Yup.date().required("Due date is required"),
@@ -31,6 +33,8 @@ const InvoiceComponent = () => {
   ]);
   const [ReservationProducts, setReservationProducts] = useState([]);
   const [Clients, setClients] = useState([]);
+  const [maxDiscount, setMaxDiscount] = useState(0);
+  const [downloadInvoiceID, setDownloadInvoiceID] = useState(null);
 
   const [invoice, setInvoice] = useState({
     invoiceNumber: ``,
@@ -219,87 +223,146 @@ const InvoiceComponent = () => {
     }
   };
 
-  const handleSave = async () => {
-    // Convert invoice date and due date to ISO-8601 format
 
-    await formik.handleSubmit();
-    const formattedInvoiceDate = new Date(invoice.invoiceDate).toISOString();
-    const formattedDueDate = new Date(invoice.dueDate).toISOString();
-
-    // Format the items
-    const formattedItems = products.map((product) => ({
-      ProductID: parseInt(invoice.product),
-      Description: product.name,
-      Quantity: parseInt(product.quantity),
-      DiscountType: invoice.discountType,
-      DiscountValue: parseFloat(invoice.discountValue),
-      Tax: product.tax.toString(),
-      TotalTTC: parseFloat(
-        (product.quantity * product.rate * (1 + product.tax / 100)).toFixed(3)
-      ),
-      Notes: invoice.notes,
-      Terms: invoice.terms,
-      SignatureName: invoice.signatureName,
-      Discount: parseFloat(invoice.discountValue),
-      Rate: parseFloat(product.rate),
-      Amount: parseFloat((product.quantity * product.rate).toFixed(3)),
-      Montant_Achat: parseFloat(product.newColumn1),
-      Montant_Debourser: parseFloat(product.newColumn2),
-    }));
-
-    // Create invoice data object
-    const invoiceData = {
-      invoiceNumber: invoice.invoiceNumber,
-      customerName: invoice.customerName,
-      InvoiceDate: formattedInvoiceDate, // Use formatted date
-      dueDate: formattedDueDate, // Use formatted date
-      Status: invoice.status,
-      referenceNumber: invoice.referenceNumber,
-      DescriptionProduct:
-        ReservationProducts.find(
-          (p) => p.ProductID === parseInt(invoice.product)
-        )?.Type || "", // Use the product type
-      TotalHT: parseFloat(calculateAmounts().taxableAmount), // Convert to float
-      Discount: parseFloat(calculateAmounts().discount), // Convert to float
-      Tva: parseFloat(calculateAmounts().tva), // Convert to float
-      Timbre_Fiscal: parseFloat(calculateAmounts().totalTimbreFiscale), // Convert to float
-      TotalAmount: parseFloat(calculateAmounts().totalAmount).toFixed(3), // Convert to float
-      clientId:
-        Clients.find((c) => c.Client_ID === invoice.Client_ID)?.Client_ID || "", // Use the client ID
-      Items: formattedItems,
-    };
-
-    console.log("Invoice data being sent to the server:", invoiceData);
-    console.log("Invoice client ID", invoice.Client_ID);
-
+  const handleDownloadClickSaveInvoice = async (invoiceID, invoiceNumber, invoiceData) => {
+    setDownloadInvoiceID(invoiceID);
+  
+    // Show loading message and keep the message open until you close it manually
+    const hideLoadingMessage = message.loading('Generating PDF, please wait...', 0);
+  
     try {
-      const response = await AxiosInstance.post(
-        "/api/v1/createInvoice",
-        invoiceData
-      );
-
-      if (response.data.success) {
-        console.log("Invoice created successfully", response.data);
-        toast.success('Facture créée avec succès!');
-        setInvoice(initialInvoiceState);
-        setProducts([{ name: "", quantity: 0, rate: 0 }]);
-
-      }
+      // Generate the PDF, using invoiceData instead of data
+      const blob = await pdf(<PDFRenderComponent record={invoiceData} />).toBlob();
+      
+      // Create form data
+      const formData = new FormData();
+      formData.append('file', blob, `Invoice_${invoiceNumber}.pdf`);
+  
+      // Send the PDF to the server
+      const response = await axiosInstance.post(`/api/v1/saveInvoicePdf/${invoiceNumber}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('PDF saved successfully!', response.data);
+  
+      // Close the loading message once PDF generation and server saving is complete
+      hideLoadingMessage();
+  
+      // Show success message after the loading completes
+      message.success(`PDF saved successfully! Invoice number: ${invoiceNumber}`);
+      
+      // Trigger the PDF download
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `Invoice_${invoiceNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
     } catch (error) {
-      console.error("Error creating invoice:", error);
-      toast.error('Erreur lors de la création de la facture!');
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("Request data:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      console.error("Config:", error.config);
+      // Close the loading message in case of an error
+      hideLoadingMessage();
+      console.error('Error saving PDF:', error);
+      message.error('Error generating or saving PDF.');
     }
   };
+  
+
+
+
+const handleSave = async () => {
+  await formik.handleSubmit();
+  const formattedInvoiceDate = new Date(invoice.invoiceDate).toISOString();
+  const formattedDueDate = new Date(invoice.dueDate).toISOString();
+
+  const formattedItems = products.map((product) => ({
+    ProductID: parseInt(invoice.product),
+    Description: product.name,
+    Quantity: parseInt(product.quantity),
+    DiscountType: invoice.discountType,
+    DiscountValue: parseFloat(invoice.discountValue),
+    Tax: product.tax.toString(),
+    TotalTTC: parseFloat(
+      (product.quantity * product.rate * (1 + product.tax / 100)).toFixed(3)
+    ),
+    Notes: invoice.notes,
+    Terms: invoice.terms,
+    SignatureName: invoice.signatureName,
+    Discount: parseFloat(invoice.discountValue),
+    Rate: parseFloat(product.rate),
+    Amount: parseFloat((product.quantity * product.rate).toFixed(3)),
+    Montant_Achat: parseFloat(product.newColumn1),
+    Montant_Debourser: parseFloat(product.newColumn2),
+  }));
+
+  const invoiceData = {
+
+    client: {
+      ClientName: Clients.find((c) => c.Client_ID === invoice.Client_ID)?.ClientName || "",
+      ClientAddress: Clients.find((c) => c.Client_ID === invoice.Client_ID)?.ClientAddress || "",
+      ClientPhone: Clients.find((c) => c.Client_ID === invoice.Client_ID)?.ClientPhone || "",
+      Matricule_fiscale: Clients.find((c) => c.Client_ID === invoice.Client_ID)?.Matricule_fiscale || "",
+    },
+
+    invoiceNumber: invoice.invoiceNumber,
+    customerName: invoice.customerName,
+    InvoiceDate: formattedInvoiceDate,
+    dueDate: formattedDueDate,
+    Status: invoice.status,
+    referenceNumber: invoice.referenceNumber,
+    DescriptionProduct:
+      ReservationProducts.find(
+        (p) => p.ProductID === parseInt(invoice.product)
+      )?.Type || "",
+    TotalHT: parseFloat(calculateAmounts().taxableAmount),
+    Discount: parseFloat(calculateAmounts().discount),
+    Tva: parseFloat(calculateAmounts().tva),
+    Timbre_Fiscal: parseFloat(calculateAmounts().totalTimbreFiscale),
+    TotalAmount: parseFloat(calculateAmounts().totalAmount).toFixed(3),
+    clientId:
+      Clients.find((c) => c.Client_ID === invoice.Client_ID)?.Client_ID || "",
+    Items: formattedItems,
+  };
+
+  try {
+    const response = await AxiosInstance.post(
+      "/api/v1/createInvoice",
+      invoiceData
+    );
+
+    if (response.data.success) {
+      console.log("Invoice created successfully", response.data);
+      message.success('Facture créée avec succès!');
+      setInvoice(initialInvoiceState);
+      setProducts([{ name: "", quantity: 0, rate: 0 }]);
+
+      // Call the function to save and download the invoice PDF
+      await handleDownloadClickSaveInvoice(response.data.invoiceID, invoice.invoiceNumber, invoiceData);
+
+      // Recall the invoice number fetch and update the input
+      await handleInvoiceNumberFetch();
+    } else {
+      invoice.invoiceNumber = "";
+      handleInvoiceNumberFetch();
+    }
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+    toast.error('Erreur lors de la création de la facture!');
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Request data:", error.request);
+    } else {
+      console.error("Error message:", error.message);
+    }
+    console.error("Config:", error.config);
+  }
+};
+
 
   const handleSend = async () => {
     await handleSave();
@@ -373,8 +436,17 @@ const InvoiceComponent = () => {
     if (invoice.discountType === "Percentage(%)") {
       totalDiscount = (taxableAmount * discountValue) / 100;
     } else {
+      
       totalDiscount = discountValue;
     }
+
+    if( totalDiscount > totalAmount){
+      totalDiscount = totalAmount;
+      message.error('Le montant de la remise ne peut pas être supérieur au montant total de la facture!');
+    }
+    
+
+    
 
     totalAmount += totalTimbreFiscale - totalDiscount;
 
@@ -444,6 +516,7 @@ const InvoiceComponent = () => {
             value={invoice.invoiceNumber}
             onChange={handleChange}
             onBlur={formik.handleBlur}
+            
             style={
               formik.touched.invoiceNumber && formik.errors.invoiceNumber
                 ? { borderColor: "red" }
@@ -465,7 +538,7 @@ const InvoiceComponent = () => {
             optionFilterProp="children"
             filterOption={filterOption}
             name="customerName"
-            value={invoice.customerName}
+            value={invoice.customerName || ""} // Ensure value is not undefined
             onChange={(value) => handleChange("customerName", value)}
             style={{ width: "100%", height: 45 }}
             className={
@@ -741,6 +814,7 @@ onClick={handleClientNavigationPage}>
             value={invoice.discountValue}
             onChange={handleChange}
           />
+          
         </div>
         {/* <div className="form-group">
           <label>Tax</label>

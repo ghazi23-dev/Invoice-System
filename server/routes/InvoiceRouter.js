@@ -10,6 +10,7 @@ InvoiceRouter.get('/api/v1/getInvoiceByID/:InvoiceID', authenticateToken,Invoice
 InvoiceRouter.get('/api/v1/getInvoices', authenticateToken,InvoiceController.getInvoices);
 
 InvoiceRouter.get('/api/v1/getLastInvoiceNumber',InvoiceController.getLastInvoiceNumber);
+InvoiceRouter.delete('/api/v1/deleteInvoice/:InvoiceID', InvoiceController.DeleteInvoice);
 
 
 
