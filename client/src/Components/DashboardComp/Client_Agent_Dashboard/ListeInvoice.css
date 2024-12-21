@@ -1,0 +1,85 @@
+/* Statistics Cards */
+.MuiCard-root {
+  background: white !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  height: 100% !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  padding: 24px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.MuiCard-root:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Icon Container */
+.MuiCard-root .MuiBox-root {
+  margin-bottom: 16px;
+}
+
+/* Icon Styling */
+.MuiCard-root .MuiSvgIcon-root {
+  font-size: 40px !important;
+  width: 50px !important;
+  height: 50px !important;
+  padding: 16px !important;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Card specific icon colors */
+.MuiCard-root:nth-child(1) .MuiSvgIcon-root {
+  color: #1a237e !important;
+  background: rgba(26, 35, 126, 0.1);
+}
+
+.MuiCard-root:nth-child(2) .MuiSvgIcon-root {
+  color: #0288d1 !important;
+  background: rgba(2, 136, 209, 0.1);
+}
+
+.MuiCard-root:nth-child(3) .MuiSvgIcon-root {
+  color: #2e7d32 !important;
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.MuiCard-root:nth-child(4) .MuiSvgIcon-root {
+  color: #ed6c02 !important;
+  background: rgba(237, 108, 2, 0.1);
+}
+
+/* Typography Styling */
+.MuiCard-root .MuiTypography-h6 {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+  margin-bottom: 4px !important;
+}
+
+.MuiCard-root .MuiTypography-body2 {
+  font-size: 14px !important;
+  color: #666 !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .MuiCard-root {
+    margin-bottom: 16px !important;
+  }
+  
+  .MuiCard-root .MuiSvgIcon-root {
+    font-size: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 12px !important;
+  }
+}

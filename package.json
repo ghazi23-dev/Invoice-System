@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ag-grid-community": "^32.2.2",
+    "ag-grid-react": "^32.2.2",
     "concurrently": "^8.2.2",
     "dotenv": "^16.4.5"
   }

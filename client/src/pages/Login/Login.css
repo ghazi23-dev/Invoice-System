@@ -221,12 +221,12 @@ a {
   background-color: #071E3D;
   text-align: center;
   padding: 5px;
-  border-top: 3px solid #ffffff;
+  border-top: 3px solid #ffffff !important;
 }
 
 .bottom-links a {
   margin: 0 15px;
-  color: #ffffff;
+  color: #ffffff !important;
   text-decoration: none;
 }
 
@@ -238,5 +238,10 @@ a {
   margin-top: 5px;
   font-size: 15px;
   
-  color: #ffffff;
+  color: #ffffff !important;
+}
+
+.copyright p{
+ 
+  color: #ffffff !important;
 }

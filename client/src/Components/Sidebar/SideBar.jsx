@@ -12,7 +12,7 @@ import MenuList from "./MenuList";
 import ToggleThemeBtn from "./ToggleThemeBtn";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ErrorPage from "../../pages/Error/Error";
-import Dashboard from "../DashboardComp/Dashboard/Dashboard";
+import Dashboard from "../DashboardComp/Vente_Journaliere/Tableau_Vente_Journaliere";
 import { toast } from "react-toastify";
 import "./Sidebar.css";
 import { UserOutlined } from "@ant-design/icons";
@@ -20,14 +20,15 @@ import Breadcrumb from "./Breadcumbs";
 import { fetchStockNotif } from "../../pages/Login/Login";
 import PrivateRoute from "../../Auth/Auth";
 import axiosInstance from "../../Auth/AxiosInstance";
-import Agent from "../DashboardComp/Agents/Agent";
-import Agence from "../DashboardComp/Agence/Agence";
+import Agent from "../DashboardComp/Users/Agent";
+import Agence from "../DashboardComp/Agence/Dashboard";
 import Facturation from "../DashboardComp/DashboardBi/InvoiceComponent";
 import Produit_Reservation from "../DashboardComp/Produit_Reservation/Produit_Reservation";
 import Invoice_List from "../DashboardComp/DashboardBi/InvoiceList";
 import ClientTiers from "../DashboardComp/ClientTiers/Client";
 import InvoiceViewForm from "../DashboardComp/DashboardBi/InvoiceViewComponent"
 import PDF from "../DashboardComp/PDF_Files/PDF";
+import InvoiceListe from "../DashboardComp/Client_Agent_Dashboard/ListeInvoice"
 const SideBar = () => {
   const { Header, Sider, Content } = Layout;
   const [darkTheme, setDarkTheme] = useState(true);
@@ -190,11 +191,11 @@ const SideBar = () => {
             <Route path="/Agence" element={<PrivateRoute element={<Agence />} roles={['Owner']} />} />
             <Route path="/DashboardBi" element={<PrivateRoute element={<Facturation />} roles={['Owner']} />} />
             <Route path="/Produit_Reservation" element={<PrivateRoute element={<Produit_Reservation />} roles={['Owner']} />} />
-            
-            <Route path="/ListeFacture" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
+            <Route path="/ListeFactureQQ" element={<PrivateRoute element={<Invoice_List />} roles={['Owner']} />} />
             <Route path="/Client" element={<PrivateRoute element={<ClientTiers />} roles={['Owner']} />} />
-            <Route path="/ListeFacture/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
+            <Route path="/ListeFactures/:InvoiceID" element={<PrivateRoute element={<InvoiceViewForm />} roles={['Owner']} />} />
             <Route path="/PDF" element={<PrivateRoute element={<PDF />} roles={['Owner']} />} />
+            <Route path="/ListeFactures" element={<PrivateRoute element={<InvoiceListe />} roles={['Owner']} />} />
          {/* <Route path="*" element={<Dashboard/>} /> */}
           </Routes>
         </Content>

@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../Auth/AxiosInstance";
 import "ag-grid-community/styles/ag-theme-material.css";
-import { FilePdfFilled,  } from "@ant-design/icons";
 import { Button, Space, Modal, Tag, message } from "antd";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import PDFRenderComponent from "./Row_PDF_Reglement_Quittance";
-import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
+import {  pdf } from "@react-pdf/renderer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faDownload,faEye,faTrash} from "@fortawesome/free-solid-svg-icons";
 import InvoiceViewForm from "./InvoiceViewComponent";
@@ -73,7 +72,7 @@ const Invoice_List = () => {
         },
       });
       console.log('PDF saved successfully!', response.data);
-      message.success('PDF saved successfully!');
+      message.success(`PDF saved successfully! Invoice number: ${invoiceNumber}`);
       
       // Once saved, trigger the download
       const link = document.createElement('a');
@@ -116,7 +115,7 @@ const Invoice_List = () => {
       const invoice = response.data.success ? response.data.invoice : response.data;
       setInvoiceData(invoice);
       console.log("Invoice Data:", invoice);
-      navigate(`/Dashboard/ListeFacture/${InvoiceID}`); // Navigate to the new route
+      navigate(`/Dashboard/ListeFactures/${InvoiceID}`); // Navigate to the new route
     } catch (error) {
       console.error("Error fetching invoice data:", error);
     }

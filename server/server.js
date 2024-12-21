@@ -10,30 +10,6 @@ const path = require('path');
 
 
 
-
-
-// app.post('/generate-invoice', async (req, res) => {
-//     try {
-//         const invoiceData = {
-//             customerName: req.body.customerName || 'John Doe',
-//             totalAmount: req.body.totalAmount || '150.00',
-//             date: new Date().toLocaleDateString(),
-//         };
-
-//         const fileName = `invoice_${Date.now()}`;
-//         const pdfPath = await generateInvoicePDF(invoiceData, fileName);
-
-//         res.json({ message: 'Invoice generated successfully', pdfPath });
-//     } catch (error) {
-//         res.status(500).json({ error: 'Failed to generate invoice PDF' });
-//     }
-// });
-
-
-
-
-
-
 app.use(cors({
   origin: "http://localhost:5173",
   // origin: "https://facturations.kayanvoyages.tn",
@@ -45,15 +21,7 @@ app.use(cors({
 app.use(cookieParser());
 
 
-app.use('/pdfs', express.static(path.join(__dirname, '../pdfs')));
-
-
-
-
-
-
-
-  
+app.use('/pdfs', express.static(path.join(__dirname, './pdfs')));
 
 
 
@@ -86,25 +54,7 @@ app.use(ffRouter);
 
 
 
-// app.get("/", async (req, res) => {
-//   const allUsers = await prisma.users.findMany();
-//   res.json(allUsers);
-// });
 
-// app.post("/", async (req, res) => {
-//   const newUser = await prisma.users.create({ data: req.body });
-//   res.json(newUser);
-// });
-
-// app.put("/:id", async (req, res) => {
-//           const { id } = req.params;
-//           const updatedUser = await prisma.users.update({
-//           where: { id: parseInt(id) },
-//           data: req.body,
-//           });
-//           res.json(updatedUser);
-//           });
-
-app.listen(3003, () => {
-  console.log("Server is running on port 3003");
+app.listen(3004, () => {
+  console.log("Server is running on port 3004");
 });

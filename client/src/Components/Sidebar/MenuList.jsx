@@ -81,17 +81,13 @@ useEffect(() => {
           <Link to="/Dashboard/DashboardBi">Ajouter Facture</Link>
         </Menu.Item>
         <Menu.Item key="Liste Facture" icon={<FontAwesomeIcon icon={faList12} />}>
-          <Link to="/Dashboard/ListeFacture">Liste Facture</Link>
+          <Link to="/Dashboard/ListeFactures">Liste Facture</Link>
         </Menu.Item>
      
       </Menu.SubMenu> 
 
 
-            {(isAdmin) ? (
-      <Menu.Item key="FacturationID"icon={<FontAwesomeIcon icon={faFileInvoiceDollar} />} >
-        <Link to="/Dashboard/ListeFacture/:InvoiceID">View INV</Link>
-      </Menu.Item>
-            ) : null}
+         
 
             
             
@@ -159,6 +155,11 @@ useEffect(() => {
       <Menu.Item key="settings" icon={<SettingOutlined />}>
         <Link to="/Dashboard/PDF">Paramètres PDF</Link>
       </Menu.Item>
+
+         
+   
+
+     
     </Menu>
   );
   

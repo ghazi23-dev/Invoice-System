@@ -1,0 +1,17 @@
+.card-container {
+  transition: all 0.3s ease; /* Smooth transition for the whole card */
+}
+
+.card-content {
+  overflow: hidden; /* Prevent overflow when closed */
+ 
+  opacity: 0; /* Default to fully transparent */
+}
+
+.card-content.open {
+  opacity: 1; /* Fully visible when open */
+}
+
+.card-content.closed {
+  opacity: 0; /* Fully transparent when closed */
+}

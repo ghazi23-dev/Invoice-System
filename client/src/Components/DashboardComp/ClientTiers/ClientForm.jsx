@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { Modal, Input, Select } from "antd";
+import { Modal, Input, Select, message } from "antd";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../Auth/AxiosInstance";
 import { useFormik } from "formik";
@@ -110,10 +110,10 @@ await formik.handleSubmit();
       console.log("Response from server:", response.data);
 
     if(response.data.success) {
-      toast.success(response.data.message);
+      message.success(response.data.message);
 
     }else{
-      toast.error(response.data.message);
+      message.error(response.data.message);
     }
 
     

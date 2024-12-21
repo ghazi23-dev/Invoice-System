@@ -516,7 +516,7 @@ const handleSave = async () => {
             value={invoice.invoiceNumber}
             onChange={handleChange}
             onBlur={formik.handleBlur}
-            
+            disabled
             style={
               formik.touched.invoiceNumber && formik.errors.invoiceNumber
                 ? { borderColor: "red" }
@@ -530,49 +530,61 @@ const handleSave = async () => {
             </span>
           ) : null}
         </div>
+        
         <div className="form-group">
-          <label>Customer Name</label>
-          <Select
-            showSearch
-            placeholder="Choisissez un client"
-            optionFilterProp="children"
-            filterOption={filterOption}
-            name="customerName"
-            value={invoice.customerName || ""} // Ensure value is not undefined
-            onChange={(value) => handleChange("customerName", value)}
-            style={{ width: "100%", height: 45 }}
-            className={
-              formik.touched.customerName && formik.errors.customerName
-                ? "select-error"
-                : ""
-            }
-          >
-            {Clients.map((client, index) => (
-              <Option key={index} value={client.ClientName}>
-                {client.ClientName}
-              </Option>
-            ))}
-          </Select>
-          {formik.touched.customerName && formik.errors.customerName ? (
-            <span style={{ color: "red", fontSize: 11 }}>
-              {" "}
-              {formik.errors.customerName}{" "}
-            </span>
-          ) : null}
-        </div>
-        <div className="btn-client-add">
+  <label>Customer Name</label>
+  <Select
+    showSearch
+    placeholder="Choisissez un client"
+    optionFilterProp="children"
+    filterOption={filterOption}
+    name="customerName"
+    value={invoice.customerName || ""} // Ensure value is not undefined
+    onChange={(value) => handleChange("customerName", value)}
+    style={{ width: "100%", height: 45 }}
+    className={
+      formik.touched.customerName && formik.errors.customerName
+        ? "select-error"
+        : ""
+    }
+    dropdownRender={(menu) => (
+      <div>
+        {menu}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: 8,
+            borderTop: "1px solid #f0f0f0",
+          }}
+        >
           <Tooltip title="Ajouter un client">
-          
-           
-        <Button 
-        type="primary"
-       
-onClick={handleClientNavigationPage}>
-         +
-
-        </Button>
-        </Tooltip>
+            <Button
+              type="primary"
+              onClick={handleClientNavigationPage}
+              style={{ width: "100%" }}
+            >
+              Ajouter un client
+            </Button>
+          </Tooltip>
         </div>
+      </div>
+    )}
+  >
+    {Clients.map((client, index) => (
+      <Option key={index} value={client.ClientName}>
+        {client.ClientName}
+      </Option>
+    ))}
+  </Select>
+  {formik.touched.customerName && formik.errors.customerName ? (
+    <span style={{ color: "red", fontSize: 11 }}>
+      {formik.errors.customerName}
+    </span>
+  ) : null}
+</div>
+
+      
         <div className="form-group">
           <label>Invoice Date</label>
           <Input
@@ -699,6 +711,7 @@ onClick={handleClientNavigationPage}>
               )}
               <th>Tax</th>
               <th>Amount H.T</th>
+              <th> &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon icon={faTrash} size="lg" /></th>
             </tr>
           </thead>
           <tbody>
@@ -759,7 +772,7 @@ onClick={handleClientNavigationPage}>
                   <Input
                     type="number"
                     name="tax"
-                    style={{ color: "red", fontWeight: "bold"}}
+                    style={{ color: "red", fontWeight: "bold", width:"65px"}}
                     value={product.tax}
                     onChange={(e) => handleProductChange(index, e)}
                     disabled
@@ -786,13 +799,15 @@ onClick={handleClientNavigationPage}>
             ))}
           </tbody>
         </table>
+       
         <Button
-          style={{ marginTop: "10px" }}
+          style={{ marginTop: "10px", marginLeft: "10px" }}
           type="primary"
           onClick={handleAddProduct}
         >
           Add Product
         </Button>
+        <br/>
       </div>
       <div className="discount-section">
         <div className="form-group">
@@ -904,5 +919,6 @@ onClick={handleClientNavigationPage}>
     </div>
   );
 };
+
 
 export default InvoiceComponent;

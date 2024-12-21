@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../../Auth/AxiosInstance";
 import { Input, Button, Select } from "antd";
 import QRCode from "qrcode.react";
 import "./InvoiceViewComponent.css";
+
+
 
 const InvoiceViewComponent = () => {
   const { InvoiceID } = useParams();
   const [invoiceData, setInvoiceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { Option } = Select;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInvoiceData = async () => {
@@ -36,7 +39,11 @@ const InvoiceViewComponent = () => {
   }
 
   if (!invoiceData) {
-    return <p>No invoice data available</p>;
+    return (
+    
+        navigate(`/Dashboard/ListeFactures/`)
+  
+    );
   }
   return (
     <div className="invoice-form" id="invoice-form">
