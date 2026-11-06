@@ -1,31 +1,29 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { pdf } from "@react-pdf/renderer";
+import { Download, Receipt, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../Auth/AxiosInstance";
-import "ag-grid-community/styles/ag-theme-material.css";
-import { Button, Space, Modal, Tag, message } from "antd";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 import PDFRenderComponent from "./Row_PDF_Reglement_Quittance";
-import {  pdf } from "@react-pdf/renderer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faDownload,faEye,faTrash} from "@fortawesome/free-solid-svg-icons";
-import InvoiceViewForm from "./InvoiceViewComponent";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { DataTable } from "@/Components/ui/data-table";
+import { PageHeader } from "@/Components/ui/page-header";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Badge } from "@/Components/ui/badge";
+import { Card } from "@/Components/ui/card";
+import { ConfirmDialog } from "@/Components/ui/confirm-dialog";
+import { RowActions } from "@/Components/ui/row-actions";
+import { formatDate } from "@/lib/format";
 
 const Invoice_List = () => {
   const [data, setData] = useState([]);
-
-
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedInvoiceID, setSelectedInvoiceID] = useState(null); // State to track selected invoice ID
   const [downloadInvoiceID, setDownloadInvoiceID] = useState(null);
-  const [invoiceData, setInvoiceData] = useState(null);
+  const [quickFilter, setQuickFilter] = useState("");
 
   const navigate = useNavigate(); // Initialize useNavigate
-
 
   useEffect(() => {
     fetchData();
@@ -35,294 +33,237 @@ const Invoice_List = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get("/api/v1/getInvoices");
-      console.log("Response from server:", response.data);
-  
+
       const invoices = response.data.success ? response.data.invoices : response.data;
       // Format the dueDate properly
-      const formattedInvoices = invoices.map(invoice => ({
+      const formattedInvoices = invoices.map((invoice) => ({
         ...invoice,
-        dueDate: new Date(invoice.dueDate).toISOString().split('T')[0],
-        InvoiceDate: new Date(invoice.InvoiceDate).toISOString().split('T')[0],
-       
+        dueDate: new Date(invoice.dueDate).toISOString().split("T")[0],
+        InvoiceDate: new Date(invoice.InvoiceDate).toISOString().split("T")[0],
       }));
       setData(formattedInvoices);
-  
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data from server:", error);
+    } finally {
       setLoading(false);
     }
   };
-  
+
   const handleDownloadClick = async (invoiceID, invoiceNumber) => {
     setDownloadInvoiceID(invoiceID);
-    
+
     // Generate the PDF
-    const blob = await pdf(<PDFRenderComponent record={data.find(item => item.InvoiceID === invoiceID)} />).toBlob();
-    
+    const blob = await pdf(
+      <PDFRenderComponent record={data.find((item) => item.InvoiceID === invoiceID)} />
+    ).toBlob();
+
     // Create form data
     const formData = new FormData();
-    formData.append('file', blob, `Invoice_${invoiceNumber}.pdf`);
-    
+    formData.append("file", blob, `Invoice_${invoiceNumber}.pdf`);
+
     // Send the PDF to the server
     try {
       const response = await axiosInstance.post(`/api/v1/saveInvoicePdf/${invoiceNumber}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      console.log('PDF saved successfully!', response.data);
-      message.success(`PDF saved successfully! Invoice number: ${invoiceNumber}`);
-      
+      console.log("PDF saved successfully!", response.data);
+      toast.success(`PDF enregistré avec succès ! Facture N° : ${invoiceNumber}`);
+
       // Once saved, trigger the download
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.setAttribute('download', `Invoice_${invoiceNumber}.pdf`);
+      link.setAttribute("download", `Invoice_${invoiceNumber}.pdf`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Error saving PDF:', error);
+      console.error("Error saving PDF:", error);
+      toast.error("Erreur lors de la génération du PDF.");
     }
   };
- 
-
-  // const handleRowClick = (record) => {
-  //   setSelectedRow(record.data.InvoiceID); // Updated to access the correct data
-  // };
 
   const handleDelete = async () => {
     try {
       const response = await axiosInstance.delete(`/api/v1/deleteInvoice/${deleteItemId}`);
-      console.log("Response from server:", response.data);
       setData(data.filter((item) => item.InvoiceID !== deleteItemId));
-      message.success(`Invoice deleted successfully! ${response.data.invoiceNumber} `);
+      toast.success(`Facture supprimée avec succès ! ${response.data.invoiceNumber}`);
     } catch (error) {
       console.error("Error deleting data from server:", error);
-      toast.warn("Un Achat associé a cet Utilisateurs.");
+      toast.warn("Un achat est associé à cet élément.");
     } finally {
       setDeleteModalVisible(false);
     }
   };
 
-
-
-
   const viewInvoice1 = async (InvoiceID) => {
     try {
       const response = await axiosInstance.get(`/api/v1/getInvoiceByID/${InvoiceID}`);
-      console.log("Invoice Getted By ID:", response.data);
       const invoice = response.data.success ? response.data.invoice : response.data;
-      setInvoiceData(invoice);
-      console.log("Invoice Data:", invoice);
       navigate(`/Dashboard/ListeFactures/${InvoiceID}`); // Navigate to the new route
+      return invoice;
     } catch (error) {
       console.error("Error fetching invoice data:", error);
     }
   };
 
-
- 
+  const filteredData = useMemo(() => {
+    const q = quickFilter.trim().toLowerCase();
+    if (!q) return data;
+    return data.filter(
+      (inv) =>
+        String(inv.invoiceNumber || "").toLowerCase().includes(q) ||
+        String(inv.customerName || "").toLowerCase().includes(q) ||
+        String(inv.DescriptionProduct || "").toLowerCase().includes(q)
+    );
+  }, [data, quickFilter]);
 
   const columns = [
-    // { 
-    //   headerName: "N° Ligne", 
-    //   field: "InvoiceID",
-    //   cellRenderer: (params) => (
-    //     <Tag color="orange-inverse">{params.value}</Tag>
-    //   ),
-    //   maxWidth: 130,
-    // },
-    { 
-      headerName: "N° Facture", 
-      field: "invoiceNumber",
-      cellRenderer: (params) => (
-        <Tag color="blue-inverse">{params.value}</Tag>
-      ),
-     
-    },
-    { 
-      headerName: "Nom Client", 
-      field: "customerName" ,
-      minWidth: 190,
-
-
-    },
-    { 
-      headerName: "Date Facturation", 
-      field: "InvoiceDate",
-      filter: 'agDateColumnFilter',
-      cellRenderer: (params) => (
-        <Tag color="green-inverse">
-         {(params.value).split('T')[0]}
-        </Tag>
-      ),
-      width: 190,
-
+    {
+      key: "invoiceNumber",
+      header: "N° Facture",
+      sortable: true,
+      render: (r) => <span className="font-mono text-xs font-semibold text-primary">{r.invoiceNumber}</span>,
     },
     {
-      headerName: "Date Echéance", 
-      field: "dueDate",
-      minWidth: 180,
-      filter: 'agDateColumnFilter',
-      cellRenderer: (params) => (
-        <Tag color="blue-inverse">
-        {new Date(params.value).toISOString().split('T')[0]}
-      </Tag>
-      ),
-      
-
-   
-    },
-    
-    
-    { 
-      headerName: "Status", 
-      field: "Status",
-      cellRenderer: (params) => (
-        <Tag color={params.value === "Paid" ? "green-inverse" : "red-inverse"}>{params.value}</Tag>
-      ),
-      maxWidth: 120,
-    },
-    // { 
-    //   headerName: "Reference Number", 
-    //   field: "referenceNumber" 
-    // },
-    { 
-      headerName: "Produit", 
-      field: "DescriptionProduct",
-      maxWidth: 130,
-    },
-    // { 
-    //   headerName: "Total HT", 
-    //   field: "TotalHT", 
-    //   maxWidth: 150,
-    // },
-    // { 
-    //   headerName: "Discount", 
-    //   field: "Discount" 
-    // },
-    // { 
-    //   headerName: "TVA", 
-    //   field: "Tva" 
-    // },
-    // { 
-    //   headerName: "Timbre Fiscal", 
-    //   field: "Timbre_Fiscal" 
-    // },
-    { 
-      headerName: "Montant Total", 
-      field: "TotalAmount", 
-      minWidth: 180,
-      cellRenderer: (params) => (
-        
-        
-        <Tag color="red-inverse">
-          {Number(params.value).toFixed(3)}
-        </Tag>
-      ),
-    },
-    { 
-      headerName: "Created At", 
-      field: "CreatedAt",
-      minWidth: 160,
-      cellRenderer: (params) => (
-        <Tag color="purple-inverse">{new Date(params.value).toLocaleString()}</Tag>
-      ),
-    },
-    { 
-      headerName: "Updated At", 
-      field: "UpdatedAt",
-      minWidth: 160,
-      cellRenderer: (params) => (
-        <Tag color="#008997">{new Date(params.value).toLocaleString()}</Tag>
+      key: "customerName",
+      header: "Nom client",
+      sortable: true,
+      render: (r) => (
+        <span className="block max-w-[220px] truncate font-medium" title={r.customerName}>
+          {r.customerName}
+        </span>
       ),
     },
     {
-      headerName: "Action",
-      field: "actions",
-      cellRenderer: (params) => (
-        <Space size="middle">
-          <Button
-            style={{ color: 'black', fontWeight: 'bold' }}
-            icon={<FontAwesomeIcon icon={faDownload} size="lg" />}
-            onClick={() => {
-              handleDownloadClick(params.data.InvoiceID, params.data.invoiceNumber);
-            }}
-          />
-          <Button
-          style={{ color: 'red', fontWeight: 'bold' }}
-          icon={<FontAwesomeIcon icon={faTrash} size="lg" />}
-          onClick={() => {
+      key: "InvoiceDate",
+      header: "Date facturation",
+      sortable: true,
+      render: (r) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(r.InvoiceDate)}</span>,
+    },
+    {
+      key: "dueDate",
+      header: "Date échéance",
+      sortable: true,
+      render: (r) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(r.dueDate)}</span>,
+    },
+    {
+      key: "Status",
+      header: "Statut",
+      sortable: true,
+      headerClassName: "text-center",
+      className: "text-center",
+      render: (r) =>
+        r.Status ? (
+          <Badge variant={r.Status === "Paid" ? "success" : "destructive"} dot>
+            {r.Status}
+          </Badge>
+        ) : null,
+    },
+    {
+      key: "DescriptionProduct",
+      header: "Produit",
+      headerClassName: "text-center",
+      className: "text-center",
+      render: (r) => (r.DescriptionProduct ? <Badge variant="secondary">{r.DescriptionProduct}</Badge> : null),
+    },
+    {
+      key: "TotalAmount",
+      header: "Montant (TND)",
+      sortable: true,
+      sortValue: (r) => Number(r.TotalAmount),
+      headerClassName: "text-right",
+      className: "text-right",
+      render: (r) => (
+        <span className="whitespace-nowrap font-semibold tabular-nums">{Number(r.TotalAmount).toFixed(3)}</span>
+      ),
+    },
+    {
+      key: "CreatedAt",
+      header: "Créée le",
+      sortable: true,
+      render: (r) => (
+        <span className="whitespace-nowrap text-xs text-muted-foreground">{new Date(r.CreatedAt).toLocaleString("fr-FR")}</span>
+      ),
+    },
+    {
+      key: "UpdatedAt",
+      header: "Mise à jour",
+      sortable: true,
+      render: (r) => (
+        <span className="whitespace-nowrap text-xs text-muted-foreground">{new Date(r.UpdatedAt).toLocaleString("fr-FR")}</span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      headerClassName: "text-right",
+      className: "text-right",
+      render: (r) => (
+        <RowActions
+          onView={() => viewInvoice1(r.InvoiceID)}
+          onDelete={() => {
             setDeleteModalVisible(true);
-            setDeleteItemId(params.data.InvoiceID);
-          }
-          }
-          
-          />
+            setDeleteItemId(r.InvoiceID);
+          }}
+        >
           <Button
-            style={{ color: 'black', fontWeight: 'bold' }}
-            icon={<FontAwesomeIcon icon={faEye} size="lg" />}
-            onClick={() => viewInvoice1(params.data.InvoiceID)}
-          />
-        </Space>
+            variant="ghost"
+            size="icon-sm"
+            title="Télécharger la facture"
+            onClick={() => handleDownloadClick(r.InvoiceID, r.invoiceNumber)}
+            className="text-muted-foreground hover:text-primary"
+          >
+            <Download />
+          </Button>
+        </RowActions>
       ),
     },
-    
   ];
-
-  const defaultColDef = {
-    flex: 1,
-    minWidth: 190,
-    filter: true,
-    sortable: true,
-    resizable: true,
-    floatingFilter: true,
-    editable: false,
-  };
 
   return (
     <>
-      <h1>Liste Des Facture</h1>
-      <div className="ag-theme-material" style={{ height: 700, width: '100%' }}>
-        <Button
-          className="Button"
-          type="primary"
-          
-          style={{ position: "absolute", top: "100px", right: "18px" }}
-        >
-          Insert
-        </Button>
+      <PageHeader
+        icon={Receipt}
+        title="Liste des factures"
+        description="Consultez et téléchargez l'ensemble de vos factures."
+      />
 
-     
-        <AgGridReact
-       // Updated to use onRowClicked
-          rowData={data}
-          columnDefs={columns}
-          defaultColDef={defaultColDef}
-          pagination={true}
-        />
-
-
-
-
-               {invoiceData && (
-          <div>
-            <InvoiceViewForm invoiceData={invoiceData} />
-            <button onClick={() => setSelectedInvoiceID(null)}>Close Invoice</button>
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="m-0 text-base font-semibold">Toutes les factures</h2>
+            <Badge variant="secondary">{data.length}</Badge>
           </div>
-        )}
+          <Input
+            icon={Search}
+            placeholder="Rechercher une facture…"
+            value={quickFilter}
+            onChange={(e) => setQuickFilter(e.target.value)}
+            className="h-9 sm:w-72"
+          />
+        </div>
+        <DataTable
+          columns={columns}
+          rows={filteredData}
+          getRowId={(r) => r.InvoiceID}
+          loading={loading}
+          pageSize={20}
+          pageSizeOptions={[20, 50, 100]}
+          label="factures"
+          emptyTitle="Aucune facture trouvée"
+          emptyDescription="Modifiez votre recherche pour voir plus de résultats."
+        />
+      </Card>
 
-        {/* Delete Confirmation Modal */}
-        <Modal
-          title="Confirm Deletion"
-          open={deleteModalVisible}
-          onOk={handleDelete}
-          onCancel={() => setDeleteModalVisible(false)}
-        >
-          <p>Are you sure you want to delete this item?</p>
-        </Modal>
-      </div>
+      <ConfirmDialog
+        open={deleteModalVisible}
+        onCancel={() => setDeleteModalVisible(false)}
+        onConfirm={handleDelete}
+        title="Supprimer cette facture ?"
+        description="Cette action est définitive et ne peut pas être annulée."
+      />
     </>
   );
 };

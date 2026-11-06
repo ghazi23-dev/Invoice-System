@@ -1,112 +1,73 @@
-import { Form, Input, Button, notification } from "antd";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import "./PasswordResetPage.css";
-import { MailOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { ArrowLeft, KeyRound, Mail } from "lucide-react";
+import AuthLayout from "../AuthLayout";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Field } from "@/Components/ui/field";
 
 const PasswordResetSchema = Yup.object().shape({
-  email: Yup.string().email("Email invalide").required("Required Email!"),
+  email: Yup.string().email("Adresse e-mail invalide").required("L'e-mail est requis"),
 });
 
 const PasswordResetPage = () => {
-  const navigate = useNavigate();
-
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await axios.post("/api/password-reset", values);
-      notification.success({
-        message: "Email de réinitialisation envoyé",
-        description: response.data.message,
-      });
+      toast.success(response.data?.message || "E-mail de réinitialisation envoyé");
     } catch (error) {
-      notification.error({
-        message: "Erreur",
-        description: error.response
-          ? error.response.data.message
-          : "Une erreur est survenue",
-      });
+      toast.error(error.response ? error.response.data.message : "Une erreur est survenue");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const HomeNavigation = () => {
-          navigate("/");
-            };
-
   return (
-    <div className="page-container">
-      <div className="header">
-        <img src="../../../src/assets/GSoft.png" alt="GSOFT Innovations Logo" onClick={HomeNavigation} />
+    <AuthLayout>
+      <div className="mb-8">
+        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <KeyRound className="h-6 w-6" />
+        </div>
+        <h1 className="m-0 text-2xl font-semibold tracking-tight">Mot de passe oublié ?</h1>
+        <p className="m-0 mt-2 text-sm text-muted-foreground">
+          Saisissez votre e-mail, nous vous enverrons un lien de réinitialisation.
+        </p>
       </div>
-      <div className="form-container">
-        <h2 className="page-title">Réinitialisation du mot de passe</h2>
-        <Formik
-          initialValues={{ email: "" }}
-          validationSchema={PasswordResetSchema}
-          onSubmit={handleSubmit}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            isSubmitting,
-          }) => (
-            <Form layout="vertical" onFinish={handleSubmit}>
-              <Form.Item
-                label="Email"
-                validateStatus={errors.email && touched.email ? "error" : ""}
-                help={errors.email && touched.email ? errors.email : ""}
-              >
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="Entrez votre email"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.email}
-                  size="large"
-                  prefix={<MailOutlined />}
-                />
-              </Form.Item>
-              <Form.Item>
-                <Button
-                  style={{
-                    width: "100%",
-                    height: "40px",
-                    marginTop: "0px",
-                    marginBottom: "4px",
-                  }}
-                  type="primary"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                >
-                  Réinitialiser le mot de passe
-                </Button>
-                <Button onClick={HomeNavigation}
-                type="dashed"
 
-                 style={{
-                  width: "100%",
-                  height: "40px",
-                  marginTop: "0px",
-                  marginBottom: "4px",
-                }}>
-               
-                  Retour à l`accueil
-                  
-                  </Button>
-              </Form.Item>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+      <Formik initialValues={{ email: "" }} validationSchema={PasswordResetSchema} onSubmit={handleSubmit}>
+        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+            <Field label="Adresse e-mail" htmlFor="email" error={touched.email && errors.email}>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="vous@exemple.com"
+                icon={Mail}
+                className="h-11"
+                invalid={!!(touched.email && errors.email)}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.email}
+              />
+            </Field>
+            <Button type="submit" size="lg" loading={isSubmitting} className="w-full">
+              Envoyer le lien
+            </Button>
+          </form>
+        )}
+      </Formik>
+
+      <Link
+        to="/"
+        className="mt-6 flex items-center justify-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" /> Retour à la connexion
+      </Link>
+    </AuthLayout>
   );
 };
 

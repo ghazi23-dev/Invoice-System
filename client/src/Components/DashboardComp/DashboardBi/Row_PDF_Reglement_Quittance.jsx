@@ -9,7 +9,6 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
-import Logo from "../../../assets/logaris.png";
 import LogoKV from "../../../assets/KVLogo.png";
 
 import { ToWords } from "to-words";

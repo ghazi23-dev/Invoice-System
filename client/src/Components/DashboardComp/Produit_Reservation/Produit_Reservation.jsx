@@ -1,30 +1,32 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Boxes, Plus, Search } from "lucide-react";
 import axiosInstance from "../../../Auth/AxiosInstance";
-import {
-  faTrash,
-  faEdit,
-  faEye, 
- 
-} from "@fortawesome/free-solid-svg-icons";
-import "ag-grid-community/styles/ag-theme-material.css";
 import ProduitForm from "./ProduitForm";
-import ProduitViewForm from "./ProduitViewForm";
-import { Button, Space, Modal,Tag } from "antd";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
-import "./Produit_Reservation.css";
+import { DataTable } from "@/Components/ui/data-table";
+import { PageHeader } from "@/Components/ui/page-header";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Badge } from "@/Components/ui/badge";
+import { Card } from "@/Components/ui/card";
+import { ConfirmDialog } from "@/Components/ui/confirm-dialog";
+import { RowActions } from "@/Components/ui/row-actions";
+import { formatDate } from "@/lib/format";
+
+const typeBadge = {
+  Hotel: "success",
+  Billetterie: "warning",
+  Marine: "violet",
+  "Préstation Service": "destructive",
+};
 
 const Produit_Reservation = () => {
   const [data, setData] = useState([]);
   const [isPopupOpen, setPopupOpen] = useState(false);
-  const [isPopupViewOpen, setPopupViewOpen] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [quickFilter, setQuickFilter] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -34,54 +36,24 @@ const Produit_Reservation = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get("/api/v1/getallProduit");
-      console.log("Response from server:", response.data);
-
       // Ensure response data is an array
       const Produit = response.data.success ? response.data.Produits : [];
       setData(Produit);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data from server:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // const handleEdit = async (Agency_ID) => {
-  //   try {
-  //     const response = await axiosInstance.get(`/api/v1/getagencybyid/${Agency_ID}`);
-  //     const user = response.data;
-  //     setUserData(user);
-  //     console.log("User Data:", user);
-  //     setPopupOpen(true);
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //     toast.error("Failed to fetch user data.");
-  //   }
-  // };
-
-  // const handleView = async (Agency_ID) => {
-  //   try {
-  //     const response = await axiosInstance.get(`/api/v1/getagencybyid/${Agency_ID}`);
-  //     const user = response.data;
-  //     setUserData(user);
-  //     console.log("User Data:", user);
-  //     setPopupViewOpen(true);
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //     toast.error("Failed to fetch user data.");
-  //   }
-  // };
-
-
   const handleDelete = async () => {
     try {
-      const response = await axiosInstance.delete(`/api/v1/deleteProduit/${deleteItemId}`);
-      console.log("Response from server:", response.data);
+      await axiosInstance.delete(`/api/v1/deleteProduit/${deleteItemId}`);
       setData(data.filter((item) => item.ProductID !== deleteItemId));
-      toast.success("User deleted successfully!");
+      toast.success("Supprimé avec succès !");
     } catch (error) {
       console.error("Error deleting data from server:", error);
-      toast.warn("Un Achat associé a cet Utilisateurs.");
+      toast.warn("Un achat est associé à cet élément.");
     } finally {
       setDeleteModalVisible(false);
     }
@@ -92,156 +64,118 @@ const Produit_Reservation = () => {
     setDeleteModalVisible(true);
   };
 
-  const handleUpdate = () => {
-    fetchData();
-    console.log("Data Fetched From Api Table Updated");
-  };
-
   const handleClosePopup = () => {
     setPopupOpen(false);
-    setUserData(null);
-    handleUpdate();
+    fetchData();
   };
 
-
+  const filteredData = useMemo(() => {
+    const q = quickFilter.trim().toLowerCase();
+    if (!q) return data;
+    return data.filter(
+      (p) =>
+        String(p.Libelle || "").toLowerCase().includes(q) ||
+        String(p.Type || "").toLowerCase().includes(q) ||
+        String(p.ProductID || "").toLowerCase().includes(q)
+    );
+  }, [data, quickFilter]);
 
   const columns = [
-    { headerName: "ID Produit", field: "ProductID" ,
-    maxWidth: 140,
-    cellRenderer: (params) => (
-      
-      <Tag color="black">{params.value}</Tag>
-    ),
-    
-    },
-    { headerName: "Désignation", 
-    field: "Libelle",
-    
-    
-  },
- 
-    { headerName: "Type Réservation", field: "Type",
-    cellRenderer: (params) => {
-      let tagColor;
-      switch (params.value) {
-        case 'Hotel':
-          tagColor = 'green-inverse';
-          break;
-        case 'Billetterie':
-          tagColor = 'orange-inverse';
-          break;
-          case 'Marine':
-          tagColor = 'purple-inverse';
-          break;
-        case 'Préstation Service':
-          tagColor = 'red-inverse';
-          break;
-         
-        default:
-          tagColor = 'default'; 
-      }
-    
-      return <Tag color={tagColor}>{params.value}</Tag>;
-    },
-
-    
-      
-     },
-
-     { headerName: "TVA", 
-      field: "Tva",
-      cellRenderer: (params) => (
-        
-        <Tag color="blue-inverse">
-          {Number(params.value).toFixed(3)}%
-        </Tag>
-      ),
-      
-      
-    },
-    { headerName: "Date Création", field: "Created_at" },
-
- 
     {
-      headerName: "Action",
-      field: "actions",
-      maxWidth: 180,
-      cellRenderer: (params) => (
-        <Space size="middle">
-          <Button
-            style={{ color: "green", fontWeight: "bold" }}
-            icon={<FontAwesomeIcon icon={faEdit} size="lg" />}
-            onClick={() => handleEdit(params.data.Agency_ID)}
-          ></Button>
-          <Button
-            style={{ color: "red", fontWeight: "bold" }}
-            icon={<FontAwesomeIcon icon={faTrash} size="lg" />}
-            onClick={() => showDeleteModal(params.data.ProductID)}
-          ></Button>
-           <Button
-            style={{ color: "BLACK", fontWeight: "bold" }}
-            icon={<FontAwesomeIcon icon={faEye} size="lg" />}
-            onClick={() => handleView(params.data.Agency_ID)}
-          ></Button>
-         
-        </Space>
-      ),
+      key: "ProductID",
+      header: "ID Produit",
+      sortable: true,
+      sortValue: (r) => Number(r.ProductID),
+      render: (r) => <span className="font-mono text-xs font-semibold text-primary">#{r.ProductID}</span>,
+    },
+    {
+      key: "Libelle",
+      header: "Désignation",
+      sortable: true,
+      render: (r) => <span className="font-medium">{r.Libelle}</span>,
+    },
+    {
+      key: "Type",
+      header: "Type de réservation",
+      sortable: true,
+      headerClassName: "text-center",
+      className: "text-center",
+      render: (r) => (r.Type ? <Badge variant={typeBadge[r.Type] || "secondary"}>{r.Type}</Badge> : null),
+    },
+    {
+      key: "Tva",
+      header: "TVA",
+      headerClassName: "text-center",
+      className: "text-center",
+      render: (r) =>
+        r.Tva !== null && r.Tva !== undefined && r.Tva !== "" ? (
+          <Badge variant="default">{Number(r.Tva).toFixed(3)} %</Badge>
+        ) : null,
+    },
+    {
+      key: "Created_at",
+      header: "Date de création",
+      sortable: true,
+      render: (r) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(r.Created_at)}</span>,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      headerClassName: "text-right",
+      className: "text-right",
+      render: (r) => <RowActions onDelete={() => showDeleteModal(r.ProductID)} />,
     },
   ];
 
-  const defaultColDef = {
-    flex: 1,
-    minWidth: 160,
-    filter: true,
-    sortable: true,
-    resizable: true,
-    floatingFilter: true,
-    editable: false,
-  };
-
   return (
     <>
-      <h1>Liste Des Produits</h1>
-      <div className="ag-theme-material" style={{ height: 700, width: '100%' }}>
-        <Button
-          className="Button"
-          type="primary"
-          onClick={() => setPopupOpen(true)}
-          style={{ position: "absolute", top: "100px", right: "18px" }}
-        >
-          Insert
-        </Button>
-        <AgGridReact
-          rowData={data}
-          columnDefs={columns}
-          defaultColDef={defaultColDef}
-          pagination={true}
+      <PageHeader
+        icon={Boxes}
+        title="Produits de réservation"
+        description="Catalogue des hôtels, billetteries, traversées marines et services."
+        actions={
+          <Button onClick={() => setPopupOpen(true)}>
+            <Plus /> Nouveau produit
+          </Button>
+        }
+      />
+
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="m-0 text-base font-semibold">Tous les produits</h2>
+            <Badge variant="secondary">{data.length}</Badge>
+          </div>
+          <Input
+            icon={Search}
+            placeholder="Rechercher un produit…"
+            value={quickFilter}
+            onChange={(e) => setQuickFilter(e.target.value)}
+            className="h-9 sm:w-72"
+          />
+        </div>
+        <DataTable
+          columns={columns}
+          rows={filteredData}
+          getRowId={(r) => r.ProductID}
+          loading={loading}
+          pageSize={20}
+          pageSizeOptions={[20, 50, 100]}
+          label="produits"
+          emptyTitle="Aucun produit trouvé"
+          emptyDescription="Modifiez votre recherche pour voir plus de résultats."
         />
-        {isPopupOpen && (
-          <ProduitForm
-            isOpen={isPopupOpen}
-            onClose={handleClosePopup}
-            userData={userData}
-          />
-        )}
+      </Card>
 
-        {isPopupViewOpen && (
-          <ProduitViewForm
-            isOpen={isPopupViewOpen}
-            onClose={handleClosePopup}
-            userData={userData}
-          />
-        )}
+      {isPopupOpen && <ProduitForm isOpen={isPopupOpen} onClose={handleClosePopup} />}
 
-        <Modal
-          title="Confirm Deletion"
-          open={deleteModalVisible}
-          onOk={handleDelete}
-          onCancel={() => setDeleteModalVisible(false)}
-        >
-          <p>Are you sure you want to delete this item?</p>
-        </Modal>
-      </div>
+      <ConfirmDialog
+        open={deleteModalVisible}
+        onCancel={() => setDeleteModalVisible(false)}
+        onConfirm={handleDelete}
+        title="Supprimer ce produit ?"
+        description="Cette action est définitive et ne peut pas être annulée."
+      />
     </>
   );
 };

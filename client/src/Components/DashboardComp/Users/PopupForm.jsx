@@ -1,36 +1,35 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { Modal, Input, Select } from "antd";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Auth/AxiosInstance";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-const { Option } = Select;
-import "./Agent.css";
+import { AtSign, Calendar, Hash, KeyRound, Lock, Mail, User, UserPlus, UserPen } from "lucide-react";
+import axiosInstance from "../../../Auth/AxiosInstance";
+import { Modal } from "@/Components/ui/dialog";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Field, fieldError, bindField } from "@/Components/ui/field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+
 const PopupForm = ({ isOpen, onClose, userData }) => {
   const [open, setOpen] = useState(isOpen);
-
-
- 
+  const [submitting, setSubmitting] = useState(false);
 
   const validationSchema = Yup.object().shape({
     id_users: Yup.string().required("ID Required"),
     fullname: Yup.string().required("Nom Agent Required"),
     UserName: Yup.string().required("Nom d`utilisateur Required"),
-    email: Yup.string().email("Invalid email address").required("Email Required"),    
-    password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password Required"),
+    email: Yup.string().email("Invalid email address").required("Email Required"),
+    password: Yup.string().min(8, "Password must be at least 8 characters").required("Password Required"),
     password2: Yup.string()
-    .oneOf([Yup.ref('Password'), null], 'Passwords must match')
-    .required('Password Confirmation Required'),    
+      .oneOf([Yup.ref("Password"), null], "Passwords must match")
+      .required("Password Confirmation Required"),
     role: Yup.string().required("Role Required"),
     num_cin: Yup.string()
-    .min(8, "Numéro CIN must be at least 8 characters") 
-    .max(10, "Numéro CIN must be at most 10 characters")
-    .required("Numéro CIN Required"), 
-      date_naissance: Yup.date().required("Date de Naissance Required"),
-
+      .min(8, "Numéro CIN must be at least 8 characters")
+      .max(10, "Numéro CIN must be at most 10 characters")
+      .required("Numéro CIN Required"),
+    date_naissance: Yup.date().required("Date de Naissance Required"),
   });
 
   const formik = useFormik({
@@ -39,7 +38,7 @@ const PopupForm = ({ isOpen, onClose, userData }) => {
       UserName: "",
       fullname: "",
       UserEmail: "",
-      Role: "", 
+      Role: "",
       Password: "",
       password2: "",
       DateOfBirth: "",
@@ -49,8 +48,7 @@ const PopupForm = ({ isOpen, onClose, userData }) => {
       console.log(values);
     },
   });
- 
- 
+
   useEffect(() => {
     if (userData && userData.length > 0) {
       formik.setValues({
@@ -64,19 +62,25 @@ const PopupForm = ({ isOpen, onClose, userData }) => {
         DateOfBirth: userData[0].DateOfBirth,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
-  
+  const handleOk = async () => {
+    // Surface inline validation errors before hitting the guard below.
+    formik.handleSubmit();
 
-  const handleOk = async (close) => {
-    console.log(close);
-
-
- 
-    if (!formik.values.UserName || !formik.values.fullname || !formik.values.UserEmail || !formik.values.Password || !formik.values.Role || !formik.values.DateOfBirth){
+    if (
+      !formik.values.UserName ||
+      !formik.values.fullname ||
+      !formik.values.UserEmail ||
+      !formik.values.Password ||
+      !formik.values.Role ||
+      !formik.values.DateOfBirth
+    ) {
       return;
     }
-    
+
+    setSubmitting(true);
     try {
       let response;
       if (!userData) {
@@ -87,7 +91,6 @@ const PopupForm = ({ isOpen, onClose, userData }) => {
           Password: formik.values.Password !== "" ? formik.values.Password : undefined,
           Role: formik.values.Role,
           DateOfBirth: formik.values.DateOfBirth,
-          
         });
       } else {
         // Updating an existing user
@@ -99,245 +102,117 @@ const PopupForm = ({ isOpen, onClose, userData }) => {
           num_cin: formik.values.num_cin,
           DateOfBirth: formik.values.DateOfBirth,
         };
-      
-       
+
         if (formik.touched.Password && formik.values.Password !== "") {
           // If modified, hash the new password
           updateData.Password = formik.values.Password;
         }
-        console.log("Update Data:", updateData);
-        // Include the updated fields in the request
-        response = await axiosInstance.put(
-          "/api/v1/updateuser",
-          updateData
-        );
-      }
 
-      console.log("Response from server:", response.data);
+        response = await axiosInstance.put("/api/v1/updateuser", updateData);
+      }
 
       if (response.data.message) {
         toast.success(response.data.message);
-    } else if (response.data.error) {
+      } else if (response.data.error) {
         toast.error(response.data.error);
-    }
-    
+      }
     } catch (error) {
       if (error.response && error.response.data) {
-        if (error.response.data === "User Already Exists" || error.response.data === "User with this email already exists") {
+        if (
+          error.response.data === "User Already Exists" ||
+          error.response.data === "User with this email already exists"
+        ) {
           toast.error(error.response.data);
         } else {
-          toast.error("Error updating/adding user data:", error);
+          toast.error("Erreur lors de l'enregistrement de l'agent.");
           console.error("Error response from server:", error.response);
         }
-      } else if (error.data) {
-        if (error.data === "User Already Exists" || error.data === "User with this email already exists") {
-          toast.error(error.data);
-        } else {
-          toast.error("Error updating/adding user data:", error);
-          console.error("Error response from server:", error);
-        }
       } else {
-        toast.error("An unknown error occurred");
+        toast.error("Une erreur inconnue est survenue");
         console.error("Error:", error);
       }
     } finally {
+      setSubmitting(false);
       setOpen(false);
       onClose();
     }
-  }
-  const handleCancel = (e) => {
-    console.log(e);
+  };
+
+  const handleCancel = () => {
     setOpen(false);
     onClose();
   };
 
-
-
-
+  const isEdit = !!userData;
 
   return (
     <Modal
-      title="Edit Employee"
       open={open}
-      onOk={handleOk}
-      onCancel={handleCancel}
+      onClose={handleCancel}
+      size="lg"
+      icon={isEdit ? UserPen : UserPlus}
+      title={isEdit ? "Modifier l'agent" : "Nouvel agent"}
+      description={isEdit ? `Compte #${formik.values.User_ID}` : "Créez un compte utilisateur et définissez son rôle."}
+      footer={
+        <>
+          <Button variant="outline" onClick={handleCancel}>
+            Annuler
+          </Button>
+          <Button onClick={handleOk} loading={submitting}>
+            {isEdit ? "Enregistrer les modifications" : "Créer l'agent"}
+          </Button>
+        </>
+      }
     >
-      <div>
-        <label>ID:</label>
-        <Input 
-      value={formik.values.User_ID}
-      style={{ color: "green" ,fontFamily: "bold", fontWeight: 1000 }} 
-     
-        disabled />
-      </div>
-      <div>
-        <label>Nom Agent:</label>
-        <Input
-        value={formik.values.fullname}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        name="fullname"
-
-        style={
-          formik.touched.fullname && formik.errors.fullname
-            ? { borderColor: "red",}
-            : { fontWeight: 900 }
-        }
-        />
-         {formik.touched.fullname && formik.errors.fullname ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.fullname}{" "}
-          </span>
-        ) : null}
-    
-      </div>
-      <div>
-        <label>Nom d`utilisateur:</label>
-        <Input
-        value={formik.values.UserName}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        name="UserName"
-
-        style={
-          formik.touched.UserName && formik.errors.UserName
-            ? { borderColor: "red" }
-            :{ fontWeight: 900 }
-        }
-        />
-         {formik.touched.UserName && formik.errors.UserName ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.UserName}{" "}
-          </span>
-        ) : null}
-    
-      </div>
-      <div>
-        <label>Email:</label>
-        <Input
-          type="email"
-          value={formik.values.UserEmail}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          name="UserEmail"
-          style={
-            formik.touched.UserEmail && formik.errors.UserEmail
-              ? { borderColor: "red" }
-              :{ fontWeight: 900 }
-          }
-        />
-        {formik.touched.UserEmail && formik.errors.UserEmail ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.UserEmail}{" "}
-          </span>
-        ) : null}
-      </div>
-
-      <div>
-        <label>Mot Passe:</label>
-        <Input
-          type="password"
-          value={formik.values.Password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          name="Password"
-          style={
-            formik.touched.Password && formik.errors.Password
-              ? { borderColor: "red" }
-              : { fontWeight: 900 }
-          }
-        />
-        {formik.touched.Password && formik.errors.Password ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.Password}{" "}
-          </span>
-        ) : null}
-
-      </div>
-    
-
-      <div>
-        <label>Mot Passe:</label>
-        <Input
-          type="password"
-          value={formik.values.password2}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          name="password2"
-          style={
-            formik.touched.password2 && formik.errors.password2
-              ? { borderColor: "red" }
-              : { fontWeight: 900 }
-          }
-        />
-        {formik.touched.password2 && formik.errors.password2 ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.password2}{" "}
-          </span>
-        ) : null}
-
-      </div>
-
-    <div>
-
-
-   
-
-    </div>
-
-      <div>
-        <label>Role:</label>
-        <Select
-         value={formik.values.Role}
-          onChange={(value) => formik.setFieldValue("Role", value)}
-          onBlur={formik.handleBlur}
-          name="Role"
-          style={{ width: "100%", fontWeight: 900 ,fontFamily: "bold"}}
-          className={
-            formik.touched.Role && formik.errors.Role ? "select-error" : ""
-          }
-        >
-          <Option value="Owner">Owner</Option>
-          <Option value="SuperAdmin">SuperAdmin</Option>
-          <Option value="Agent">Agent</Option>
-        </Select>
-        {formik.touched.Role && formik.errors.Role ? (
-          <span style={{ color: "red", fontSize: 16 }}>
-            {" "}
-            {formik.errors.Role}{" "}
-          </span>
-        ) : null}
-      </div>
-
-     
-      
-      <div>
-        <label>Date de Naissance</label>
-        <Input
-          type="date"
-          value={formik.values.DateOfBirth}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          name="DateOfBirth"
-          style={
-            formik.touched.DateOfBirth && formik.errors.DateOfBirth
-              ? { borderColor: "red" }
-              : { fontWeight: 900 }
-          }
-      />
-        {formik.touched.DateOfBirth && formik.errors.DateOfBirth ? (
-          <span style={{ color: "red", fontSize: 11 }}>
-            {" "}
-            {formik.errors.DateOfBirth}{" "}
-          </span>
-        ) : null}
-      </div>
-
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleOk();
+        }}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+      >
+        {isEdit && (
+          <Field label="ID" className="sm:col-span-2">
+            <Input value={formik.values.User_ID ?? ""} icon={Hash} disabled className="font-mono" />
+          </Field>
+        )}
+        <Field label="Nom de l'agent" required error={fieldError(formik, "fullname")} className="sm:col-span-2">
+          <Input {...bindField(formik, "fullname")} icon={User} placeholder="Nom complet" />
+        </Field>
+        <Field label="Nom d'utilisateur" required error={fieldError(formik, "UserName")} className="sm:col-span-2">
+          <Input {...bindField(formik, "UserName")} icon={AtSign} placeholder="identifiant" />
+        </Field>
+        <Field label="E-mail" required error={fieldError(formik, "UserEmail")} className="sm:col-span-2">
+          <Input {...bindField(formik, "UserEmail")} type="email" icon={Mail} placeholder="agent@exemple.com" />
+        </Field>
+        <Field label="Mot de passe" error={fieldError(formik, "Password")}>
+          <Input
+            {...bindField(formik, "Password")}
+            type="password"
+            icon={KeyRound}
+            placeholder="8 caractères minimum"
+          />
+        </Field>
+        <Field label="Confirmation du mot de passe" error={fieldError(formik, "password2")}>
+          <Input {...bindField(formik, "password2")} type="password" icon={Lock} placeholder="Répétez le mot de passe" />
+        </Field>
+        <Field label="Rôle" required error={fieldError(formik, "Role")}>
+          <Select value={formik.values.Role || undefined} onValueChange={(value) => formik.setFieldValue("Role", value)}>
+            <SelectTrigger aria-invalid={!!fieldError(formik, "Role") || undefined}>
+              <SelectValue placeholder="Choisir un rôle" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Owner">Owner</SelectItem>
+              <SelectItem value="SuperAdmin">SuperAdmin</SelectItem>
+              <SelectItem value="Agent">Agent</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Date de naissance" required error={fieldError(formik, "DateOfBirth")}>
+          <Input {...bindField(formik, "DateOfBirth")} type="date" icon={Calendar} />
+        </Field>
+        <button type="submit" hidden />
+      </form>
     </Modal>
   );
 };

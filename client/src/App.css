@@ -1,116 +1,269 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;1,200&family=Poppins:wght@300&display=swap");
-@import "tailwindcss/components";
-@import "tailwindcss/base";
-@import "tailwindcss/utilities";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* @layer base {
-  * {
-    @apply border-border;
+/* ------------------------------------------------------------------ */
+/* Design tokens — Kayan Voyage (teal #1F8FA8 / sun #F7D618)           */
+/* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --background: 195 25% 97%;
+    --foreground: 200 35% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 35% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 35% 12%;
+    --primary: 191 69% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 191 45% 95%;
+    --secondary-foreground: 191 69% 26%;
+    --muted: 195 22% 95%;
+    --muted-foreground: 200 10% 44%;
+    --accent: 51 93% 53%;
+    --accent-foreground: 200 35% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 61% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 48%;
+    --warning-foreground: 0 0% 100%;
+    --border: 195 18% 89%;
+    --input: 195 18% 86%;
+    --ring: 191 69% 45%;
+    --radius: 0.625rem;
+
+    --sidebar: 197 47% 11%;
+    --sidebar-foreground: 195 20% 92%;
+    --sidebar-muted: 195 12% 62%;
+    --sidebar-accent: 195 38% 18%;
+    --sidebar-border: 195 30% 17%;
+
+    --chart-1: 191 69% 39%;
+    --chart-2: 51 93% 50%;
+    --chart-3: 152 55% 42%;
+    --chart-4: 262 52% 58%;
+    --chart-5: 12 80% 60%;
   }
+
+  .dark {
+    --background: 200 32% 7%;
+    --foreground: 195 20% 93%;
+    --card: 200 28% 10%;
+    --card-foreground: 195 20% 93%;
+    --popover: 200 28% 11%;
+    --popover-foreground: 195 20% 93%;
+    --primary: 191 62% 48%;
+    --primary-foreground: 200 40% 8%;
+    --secondary: 195 30% 15%;
+    --secondary-foreground: 191 60% 72%;
+    --muted: 200 24% 14%;
+    --muted-foreground: 200 10% 62%;
+    --accent: 51 90% 55%;
+    --accent-foreground: 200 40% 8%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 50% 45%;
+    --warning: 38 90% 55%;
+    --border: 200 22% 18%;
+    --input: 200 22% 22%;
+    --ring: 191 62% 52%;
+
+    --sidebar: 200 34% 6%;
+    --sidebar-accent: 196 30% 14%;
+    --sidebar-border: 200 25% 13%;
+  }
+
+  /* Minimal reset (preflight is disabled in tailwind.config.js) */
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-} */
 
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 100%;
+    color: inherit;
+  }
 
+  button {
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+
+  /* Slim scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+}
+
+@layer components {
+  .nice-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .nice-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 999px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* AG Grid — Quartz theme driven by the design tokens (light + dark)    */
+/* ------------------------------------------------------------------ */
+.ag-theme-quartz.app-grid {
+  --ag-font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --ag-font-size: 13px;
+  --ag-foreground-color: hsl(var(--foreground));
+  --ag-secondary-foreground-color: hsl(var(--muted-foreground));
+  --ag-data-color: hsl(var(--foreground));
+  --ag-background-color: hsl(var(--card));
+  --ag-header-background-color: hsl(var(--muted));
+  --ag-header-foreground-color: hsl(var(--muted-foreground));
+  --ag-header-cell-hover-background-color: hsl(var(--secondary));
+  --ag-odd-row-background-color: transparent;
+  --ag-row-hover-color: hsl(var(--primary) / 0.05);
+  --ag-selected-row-background-color: hsl(var(--primary) / 0.1);
+  --ag-border-color: hsl(var(--border));
+  --ag-row-border-color: hsl(var(--border) / 0.7);
+  --ag-active-color: hsl(var(--primary));
+  --ag-input-focus-border-color: hsl(var(--ring));
+  --ag-input-border-color: hsl(var(--input));
+  --ag-range-selection-border-color: hsl(var(--primary));
+  --ag-checkbox-checked-color: hsl(var(--primary));
+  --ag-control-panel-background-color: hsl(var(--card));
+  --ag-side-button-selected-background-color: hsl(var(--secondary));
+  --ag-modal-overlay-background-color: hsl(var(--card) / 0.66);
+  --ag-wrapper-border-radius: calc(var(--radius) + 4px);
+  --ag-border-radius: 6px;
+  --ag-header-height: 44px;
+  --ag-row-height: 48px;
+  --ag-cell-horizontal-padding: 16px;
+  --ag-header-column-resize-handle-color: hsl(var(--border));
+  --ag-icon-font-color: hsl(var(--muted-foreground));
+}
+
+.ag-theme-quartz.app-grid .ag-header-cell-text {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ag-theme-quartz.app-grid .ag-root-wrapper {
+  box-shadow: 0 1px 2px 0 rgb(15 34 41 / 0.04), 0 4px 16px -4px rgb(15 34 41 / 0.08);
+}
+
+.ag-theme-quartz.app-grid .ag-cell {
+  display: flex;
+  align-items: center;
+}
+
+.ag-theme-quartz.app-grid .ag-cell.justify-end,
+.ag-theme-quartz.app-grid .ag-right-aligned-cell {
+  justify-content: flex-end;
+}
+
+.ag-theme-quartz.app-grid .ag-row.new-row {
+  background-color: hsl(var(--accent) / 0.12);
+}
+
+.ag-theme-quartz.app-grid .ag-paging-panel {
+  height: 52px;
+  color: hsl(var(--muted-foreground));
+}
+
+/* ------------------------------------------------------------------ */
+/* react-toastify                                                       */
+/* ------------------------------------------------------------------ */
 :root {
-  --bg-primary: #d7ebf6;
-  --bg-secondary: #24035a;
-  --bg-terniary: #2d85a6;
-  --text-primary: #222;
-}
-
-* {
-  font-family: "Sora",  sans-serif;
-  font-weight: 400;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-
-}
-
-body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+  --toastify-font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --toastify-color-light: hsl(var(--card));
+  --toastify-text-color-light: hsl(var(--foreground));
+  --toastify-color-success: hsl(var(--success));
+  --toastify-color-error: hsl(var(--destructive));
+  --toastify-color-warning: hsl(var(--warning));
+  --toastify-color-info: hsl(var(--primary));
+  --toastify-color-progress-light: hsl(var(--primary));
+  --toastify-toast-min-height: 56px;
 }
 
 .Toastify__toast-container--top-right {
-  margin-top: 50px;
-  
+  top: 4.5rem;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+.Toastify__toast {
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 10px 38px -10px rgb(15 34 41 / 0.25), 0 10px 20px -15px rgb(15 34 41 / 0.2);
+  font-size: 14px;
+  font-weight: 500;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* ------------------------------------------------------------------ */
+/* sweetalert2                                                          */
+/* ------------------------------------------------------------------ */
+.swal2-popup {
+  border-radius: 16px !important;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
 }
-
-
-
-
+.swal2-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: hsl(var(--foreground)) !important;
+}
+.swal2-html-container {
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 0.95rem !important;
+}
+.swal2-styled.swal2-confirm {
+  background: hsl(var(--primary)) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+.swal2-styled.swal2-cancel {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-radius: 10px !important;
+}

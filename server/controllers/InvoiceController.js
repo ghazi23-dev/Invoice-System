@@ -24,6 +24,45 @@ class InvoiceController {
     }
   }
 
+  static async createCreditInvoice(req, res) {
+    try {
+      // Extract the originalInvoiceID from the request body
+      const { originalInvoiceID } = req.body;
+
+      if (!originalInvoiceID) {
+        return res.status(400).json({
+          message: 'Original Invoice ID is required',
+        });
+      }
+
+      // Call the model method to create the credit invoice
+      const creditInvoice = await InvoiceModel.createCreditInvoice({ originalInvoiceID });
+
+      // Ensure the credit invoice was created successfully
+      if (!creditInvoice) {
+        return res.status(500).json({
+          message: 'Error creating credit invoice',
+          error: 'Failed to create credit invoice',
+        });
+      }
+
+      // Send the created credit invoice back as a response
+      return res.status(201).json({
+        message: 'Credit Invoice created successfully!',
+        creditInvoice,
+      });
+    } catch (error) {
+      // Handle any errors that occur during the process
+      console.error(error);  // Log the error for debugging
+      return res.status(500).json({
+        message: 'Error creating credit invoice',
+        error: error.message,
+      });
+    }
+  }
+
+
+
   static async getInvoiceByID(req, res) {
     const { InvoiceID } = req.params;
     try {

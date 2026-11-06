@@ -13,7 +13,7 @@ InvoiceRouter.get('/api/v1/getLastInvoiceNumber',InvoiceController.getLastInvoic
 InvoiceRouter.delete('/api/v1/deleteInvoice/:InvoiceID', InvoiceController.DeleteInvoice);
 
 
-
+InvoiceRouter.post('/api/v1/create-credit-invoice', InvoiceController.createCreditInvoice);
 
 
 

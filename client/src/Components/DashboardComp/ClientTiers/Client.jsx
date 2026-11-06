@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
-
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Plus, Search, Users } from "lucide-react";
 import axiosInstance from "../../../Auth/AxiosInstance";
-import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
-import "ag-grid-community/styles/ag-theme-material.css";
 import ClientForm from "./ClientForm";
-import { Button, Space, Modal, Tag } from "antd";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+import { DataTable } from "@/Components/ui/data-table";
+import { PageHeader } from "@/Components/ui/page-header";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Badge } from "@/Components/ui/badge";
+import { Card } from "@/Components/ui/card";
+import { ConfirmDialog } from "@/Components/ui/confirm-dialog";
+import { RowActions } from "@/Components/ui/row-actions";
+import { formatDate } from "@/lib/format";
 
 const Client = () => {
   const [data, setData] = useState([]);
@@ -18,6 +20,7 @@ const Client = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [quickFilter, setQuickFilter] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -27,42 +30,34 @@ const Client = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get("/api/V1/getAllClients");
-      console.log("Response from server:", response.data);
       const clients = response.data.success ? response.data.clients : [];
       setData(clients);
-
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data from server:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEdit = async (Client_ID) => {
     try {
-      const response = await axiosInstance.get(
-        `/api/V1/getClientByID/${Client_ID}`
-      );
-      const user = response.data;
-      setUserData(user);
-      console.log("User Data:", user);
+      const response = await axiosInstance.get(`/api/V1/getClientByID/${Client_ID}`);
+      setUserData(response.data);
       setPopupOpen(true);
     } catch (error) {
       console.error("Error fetching user data:", error);
-      toast.error("Failed to fetch user data.");
+      toast.error("Impossible de charger le client.");
     }
   };
 
   const handleDelete = async () => {
     try {
-      const response = await axiosInstance.delete(
-        `/api/v1/deleteuser/${deleteItemId}`
-      );
-      console.log("Response from server:", response.data);
+      await axiosInstance.delete(`/api/v1/deleteuser/${deleteItemId}`);
       setData(data.filter((item) => item.User_ID !== deleteItemId));
-      toast.success("User deleted successfully!");
+      toast.success("Supprimé avec succès !");
     } catch (error) {
       console.error("Error deleting data from server:", error);
-      toast.warn("Un Achat associé a cet Utilisateurs.");
+      toast.warn("Un achat est associé à cet élément.");
     } finally {
       setDeleteModalVisible(false);
     }
@@ -73,117 +68,133 @@ const Client = () => {
     setDeleteModalVisible(true);
   };
 
-  const handleUpdate = () => {
-    fetchData();
-    console.log("Data Fetched From Api Table Updated");
-  };
-
   const handleClosePopup = () => {
     setPopupOpen(false);
     setUserData(null);
-    handleUpdate();
+    fetchData();
   };
 
+  const filteredData = useMemo(() => {
+    const q = quickFilter.trim().toLowerCase();
+    if (!q) return data;
+    return data.filter(
+      (c) =>
+        String(c.ClientName || "").toLowerCase().includes(q) ||
+        String(c.ClientEmail || "").toLowerCase().includes(q) ||
+        String(c.ClientPhone || "").toLowerCase().includes(q) ||
+        String(c.ClientAddress || "").toLowerCase().includes(q) ||
+        String(c.ClientLocation || "").toLowerCase().includes(q) ||
+        String(c.Matricule_fiscale || "").toLowerCase().includes(q) ||
+        String(c.Client_ID || "").toLowerCase().includes(q)
+    );
+  }, [data, quickFilter]);
+
   const columns = [
-    { headerName: "Code Client", field: "Client_ID" ,
-    cellRenderer: (params) => (
-      <Tag color="blue-inverse">{params.value}</Tag>
-    ),
-    minWidth: 80,
-    },
-    { headerName: "Nom Client", field: "ClientName",
-    cellRenderer: (params) => (
-      <Tag color="purple-inverse">{params.value}</Tag>
-    ),
-     },
-    { headerName: "Numéro Tel", field: "ClientPhone" },
-    { headerName: "Email", field: "ClientEmail" },
-    { headerName: "Adresse", field: "ClientAddress" },
-    { headerName: "Régions", field: "ClientLocation" ,
-      maxWidth: 140,
-    },
-    { headerName: "Matricule Fiscale", field: "Matricule_fiscale",
-cellRenderer: (params) => (
-          <Tag color="blue-inverse">{params.value}</Tag>
-                ),
-                maxWidth: 200,
-
-
-    },
-    
-   
-    { headerName: "Date de Création", field: "created_at" 
-    ,cellRenderer: (params) => (
-      <Tag color="green-inverse">{new Date(params.value).toLocaleString()}</Tag>
-    ),
-    minWidth: 200,
-
+    {
+      key: "Client_ID",
+      header: "Code",
+      sortable: true,
+      sortValue: (r) => Number(r.Client_ID),
+      render: (r) => <span className="font-mono text-xs font-semibold text-primary">#{r.Client_ID}</span>,
     },
     {
-      headerName: "Action",
-      field: "actions", // Make sure this matches the field in your data source
-      cellRenderer: (params) => (
-        <Space size="middle">
-          <Button
-            style={{ color: "green", fontWeight: "bold" }}
-            icon={<FontAwesomeIcon icon={faEdit} size="lg" />}
-            onClick={() => handleEdit(params.data.Client_ID)}
-          ></Button>
-          <Button
-            style={{ color: "red", fontWeight: "bold" }}
-            icon={<FontAwesomeIcon icon={faTrash} size="lg" />}
-            onClick={() => showDeleteModal(params.data.User_ID)}
-          ></Button>
-        </Space>
+      key: "ClientName",
+      header: "Client",
+      sortable: true,
+      render: (r) => (
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+            {(r.ClientName || "?").slice(0, 2).toUpperCase()}
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p className="m-0 truncate font-medium">{r.ClientName}</p>
+            {r.ClientEmail && <p className="m-0 truncate text-xs text-muted-foreground">{r.ClientEmail}</p>}
+          </div>
+        </div>
+      ),
+    },
+    { key: "ClientPhone", header: "Téléphone", render: (r) => <span className="whitespace-nowrap">{r.ClientPhone}</span> },
+    {
+      key: "ClientAddress",
+      header: "Adresse",
+      render: (r) => <span className="block max-w-[260px] truncate text-muted-foreground">{r.ClientAddress}</span>,
+    },
+    {
+      key: "ClientLocation",
+      header: "Région",
+      render: (r) => (r.ClientLocation ? <Badge variant="secondary">{r.ClientLocation}</Badge> : null),
+    },
+    {
+      key: "Matricule_fiscale",
+      header: "Matricule fiscal",
+      render: (r) => <span className="font-mono text-xs">{r.Matricule_fiscale}</span>,
+    },
+    {
+      key: "created_at",
+      header: "Créé le",
+      sortable: true,
+      render: (r) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(r.created_at)}</span>,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      headerClassName: "text-right",
+      className: "text-right",
+      render: (r) => (
+        <RowActions onEdit={() => handleEdit(r.Client_ID)} onDelete={() => showDeleteModal(r.User_ID)} />
       ),
     },
   ];
 
-  const defaultColDef = {
-    flex: 1,
-    minWidth: 190,
-    filter: true,
-    sortable: true,
-    resizable: true,
-    floatingFilter: true,
-    editable: false,
-  };
   return (
     <>
-      <h1>Liste Des Clients</h1>
-      <div className="ag-theme-material" style={{ height: 700, width: "100%" }}>
-        <Button
-          className="Button"
-          type="primary"
-          onClick={() => setPopupOpen(true)}
-          style={{ position: "absolute", top: "100px", right: "18px" }}
-        >
-          Insert
-        </Button>
-        <AgGridReact
-          rowData={data}
-          columnDefs={columns}
-          defaultColDef={defaultColDef}
-          pagination={true}
-        />
-        {isPopupOpen && (
-          <ClientForm
-            isOpen={isPopupOpen}
-            onClose={handleClosePopup}
-            userData={userData}
-          />
-        )}
+      <PageHeader
+        icon={Users}
+        title="Clients"
+        description="Gérez votre portefeuille clients et leurs informations fiscales."
+        actions={
+          <Button onClick={() => setPopupOpen(true)}>
+            <Plus /> Nouveau client
+          </Button>
+        }
+      />
 
-        {/* Delete Confirmation Modal */}
-        <Modal
-          title="Confirm Deletion"
-          open={deleteModalVisible}
-          onOk={handleDelete}
-          onCancel={() => setDeleteModalVisible(false)}
-        >
-          <p>Are you sure you want to delete this item?</p>
-        </Modal>
-      </div>
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="m-0 text-base font-semibold">Tous les clients</h2>
+            <Badge variant="secondary">{data.length}</Badge>
+          </div>
+          <Input
+            icon={Search}
+            placeholder="Rechercher un client…"
+            value={quickFilter}
+            onChange={(e) => setQuickFilter(e.target.value)}
+            className="h-9 sm:w-72"
+          />
+        </div>
+        <DataTable
+          columns={columns}
+          rows={filteredData}
+          getRowId={(r) => r.Client_ID}
+          loading={loading}
+          pageSize={20}
+          pageSizeOptions={[20, 50, 100]}
+          label="clients"
+          emptyTitle="Aucun client trouvé"
+          emptyDescription="Modifiez votre recherche pour voir plus de résultats."
+        />
+      </Card>
+
+      {isPopupOpen && <ClientForm isOpen={isPopupOpen} onClose={handleClosePopup} userData={userData} />}
+
+      <ConfirmDialog
+        open={deleteModalVisible}
+        onCancel={() => setDeleteModalVisible(false)}
+        onConfirm={handleDelete}
+        title="Supprimer ce client ?"
+        description="Cette action est définitive et ne peut pas être annulée."
+      />
     </>
   );
 };

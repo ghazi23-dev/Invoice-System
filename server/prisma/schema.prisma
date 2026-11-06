@@ -67,7 +67,7 @@ model Achat_Reservation {
   CONTACT_CLIENT String
   DATE_ENTREE    DateTime @db.Date
   REGLEMENT      String
-  NUMERO_RECU    String
+  NUMERO_RECU    Float
   PRIX_VENTE     Float
   PRIX_ACHAT     Float
   AVANCE         Float
@@ -93,13 +93,15 @@ model Achat_Reservation {
 // }
 
 model Invoice {
-  InvoiceID          Int            @id @default(autoincrement())
+    InvoiceID          Int            @id @default(autoincrement())
   invoiceNumber      String
   customerName       String
   InvoiceDate        DateTime       @db.Date
   dueDate            DateTime       @db.Date
   Status             String         @db.VarChar(50)
   referenceNumber    String?
+  ReferencedInvoiceID Int?          // Points to the original invoice for credits
+  InvoiceType        String         @default("Facture") @db.VarChar(50) // Default to "Facture"
   DescriptionProduct String
   TotalHT            Decimal        @db.Decimal(10, 3)
   Discount           Decimal        @db.Decimal(10, 3)
@@ -109,11 +111,27 @@ model Invoice {
   CreatedAt          DateTime       @default(now()) @map("CreatedAt")
   UpdatedAt          DateTime       @default(now()) @updatedAt @map("UpdatedAt")
   Items              InvoiceItems[]
+  Reglements         Reglement[]
 
   clientId           Int
   client             Client         @relation(fields: [clientId], references: [Client_ID])
 
   @@map("Invoice")
+}
+
+model Reglement {
+  ReglementID   Int      @id @default(autoincrement())
+  InvoiceID     Int
+  Montant       Decimal  @db.Decimal(10, 3)
+  Mode          String   @db.VarChar(50)
+  DateReglement DateTime @db.Date
+  Reference     String?
+  Notes         String?
+  CreatedAt     DateTime @default(now()) @map("CreatedAt")
+
+  Invoice Invoice @relation(fields: [InvoiceID], references: [InvoiceID])
+
+  @@map("Reglement")
 }
 model InvoiceItems {
   InvoiceItemID     Int      @id @default(autoincrement())

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import axiosInstance from './AxiosInstance';
 import Swal from 'sweetalert2'
+import { PageLoader } from '@/Components/ui/spinner'
 
 
 const verifyUser = async () => {
@@ -51,7 +52,7 @@ const PrivateRoute = ({ element, roles = [] }) => {
   }, []);
 
   if (authenticated === null) {
-    return <div>Loading...</div>;
+    return <PageLoader className="min-h-[70vh]" label="Vérification de la session…" />;
   }
 
   if (!authenticated) {
